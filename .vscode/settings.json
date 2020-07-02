@@ -1,0 +1,23 @@
+{
+	"workbench.tree.indent": 20,
+	"cSpell.language": "en, ru",
+	"editor.minimap.enabled": false,
+	"editor.formatOnSave": true,
+	"editor.wordWrap": "on",
+	"explorer.compactFolders": false,
+
+	"explorer.confirmDelete": true,
+	"explorer.confirmDragAndDrop": true,
+
+	"cSpell.enabledLanguageIds": [
+		"javascript",
+		"markdown",
+		"typescript",
+		"typescriptreact",
+		"yml",
+		"vue"
+	],
+	"cSpell.words": ["consola", "nuxt", "prefetch", "xlink", "noreferrer", "noopener"],
+	"cSpell.showStatus": true,
+	"path-autocomplete.extensionOnImport": true
+}

@@ -1,0 +1,21 @@
+{
+	"recommendations": [
+		"formulahendry.auto-close-tag",
+		"formulahendry.auto-complete-tag",
+		"formulahendry.auto-rename-tag",
+		"coenraads.bracket-pair-colorizer",
+		"streetsidesoftware.code-spell-checker",
+		"streetsidesoftware.code-spell-checker-russian",
+		"dbaeumer.vscode-eslint",
+		"mhutchie.git-graph",
+		"eamodio.gitlens",
+		"abusaidm.html-snippets",
+		"xabikos.javascriptsnippets",
+		"chrisvltn.log-wrapper-for-vscode",
+		"esbenp.prettier-vscode",
+		"octref.vetur",
+		"vscode-icons-team.vscode-icons",
+		"ionutvmi.path-autocomplete",
+		"shd101wyy.markdown-preview-enhanced"
+	]
+}
