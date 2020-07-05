@@ -1,0 +1,23 @@
+@font-face {
+  font-family: 'Cinzel';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Cinzel-Regular'),
+    url(http://themes.googleusercontent.com/static/fonts/cinzel/v1/Hm1qjDlZpOdVXoa-QGE7_w.ttf)
+      format('truetype');
+}
+
+@font-face {
+  font-family: 'Cinzel Decorative';
+  font-style: normal;
+  font-weight: 400;
+  src: local('CinzelDecorative-Regular'),
+    url(http://themes.googleusercontent.com/static/fonts/cinzeldecorative/v1/fmgK7oaJJIXAkhd9798yQiIQXpsbKR_wBTo1n6IkW90.ttf)
+      format('truetype');
+}
+
+@import url('https://fonts.googleapis.com/css?family=Lora');
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans&display=swap');
+
+$font__Cinzel: 'Cinzel', 'Open Sans', 'sans-serif';
+$font__Lora: 'Lora', 'Open Sans', 'sans-serif';

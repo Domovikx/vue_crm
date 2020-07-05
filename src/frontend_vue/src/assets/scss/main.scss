@@ -1,0 +1,14 @@
+@import 'rest';
+@import 'fonts';
+@import 'colors';
+@import 'buttons';
+
+*,
+html,
+body,
+span,
+button {
+  font: 300 14px/1.625 $font__Lora;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
