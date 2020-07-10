@@ -6,12 +6,12 @@
   "private": true,
   "scripts": {
     "start": "ts-node src/server/index.ts",
-    "s": "ts-node src/server/index.ts",
-    "client": "npm run serve --prefix src/frontend",
-    "c": "npm run serve --prefix src/frontend",
-    "b": "npm run build --prefix src/frontend",
-    "all": "concurrently \"npm run server\" \"npm run client\" \"npm run b\"",
-    "a": "concurrently \"npm run server\" \"npm run client\" \"npm run b\""
+    "client": "npm run serve --prefix src/frontend_vue",
+    "c": "npm run serve --prefix src/frontend_vue",
+    "client_build": "npm run build --prefix src/frontend_vue",
+    "b": "npm run build --prefix src/frontend_vue",
+    "all": "concurrently \"npm run server\" \"npm run client\" \"npm run client_build\"",
+    "a": "concurrently \"npm run server\" \"npm run client\" \"npm run client_build\""
   },
   "dependencies": {
     "@types/express": "^4.17.6",
