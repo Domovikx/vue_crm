@@ -17,7 +17,17 @@
 		"yml",
 		"vue"
 	],
-	"cSpell.words": ["consola", "nuxt", "prefetch", "xlink", "noreferrer", "noopener"],
+	"cSpell.words": [
+		"consola",
+		"devtools",
+		"noopener",
+		"noreferrer",
+		"nuxt",
+		"prefetch",
+		"vuelidate",
+		"vuetify",
+		"xlink"
+	],
 	"cSpell.showStatus": true,
 	"path-autocomplete.extensionOnImport": true
 }
