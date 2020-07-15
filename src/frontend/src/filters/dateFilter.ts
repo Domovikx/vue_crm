@@ -8,6 +8,19 @@ function dateFilter(value: any, format: string = 'date') {
     options.year = '2-digit';
   }
 
+  if (format.includes('DD')) {
+    options.day = '2-digit';
+  }
+  if (format.includes('-MM')) {
+    options.month = '2-digit';
+  }
+  if (format.includes('-YY')) {
+    options.year = '2-digit';
+  }
+  if (format.includes('-YYYY')) {
+    options.year = 'numeric';
+  }
+
   if (format.includes('time')) {
     options.hour = '2-digit';
     options.minute = '2-digit';

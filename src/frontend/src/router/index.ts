@@ -6,13 +6,39 @@ import HomePage from '../views/pages/HomePage.vue';
 Vue.use(VueRouter);
 
 const routes: Array<RouteConfig> = [
+  // EmptyLayout
+  // api для разработки, набор SVG иконок
   {
-    // api для разработки, набор SVG иконок
     path: '/api/svg',
     name: 'all-icons-page',
     component: () => import('../components/icons/AllIconsPage.vue'),
     meta: { layout: 'EmptyLayout' },
   },
+
+  // test
+  {
+    path: '/SnackTest',
+    name: 'SnackTest',
+    component: () => import('../views/pages/SnackTestPage.vue'),
+    meta: { layout: 'EmptyLayout' },
+  },
+
+  // EmptyLayout
+  // Login / Register
+  {
+    path: '/Login',
+    name: 'Login',
+    component: () => import('../views/pages/LoginPage.vue'),
+    meta: { layout: 'EmptyLayout' },
+  },
+  {
+    path: '/Register',
+    name: 'Register',
+    component: () => import('../views/pages/RegisterPage.vue'),
+    meta: { layout: 'EmptyLayout' },
+  },
+
+  // DefaultLayout
   {
     path: '/',
     name: 'Home',
@@ -25,12 +51,7 @@ const routes: Array<RouteConfig> = [
     component: () => import('../views/pages/CategoriesPage.vue'),
     meta: { layout: 'DefaultLayout' },
   },
-  {
-    path: '/Login',
-    name: 'Login',
-    component: () => import('../views/pages/LoginPage.vue'),
-    meta: { layout: 'EmptyLayout' },
-  },
+
   {
     path: '/Detail',
     name: 'Detail',
@@ -59,12 +80,6 @@ const routes: Array<RouteConfig> = [
     path: '/Record',
     name: 'Record',
     component: () => import('../views/pages/RecordPage.vue'),
-    meta: { layout: 'DefaultLayout' },
-  },
-  {
-    path: '/Register',
-    name: 'Register',
-    component: () => import('../views/pages/RegisterPage.vue'),
     meta: { layout: 'DefaultLayout' },
   },
 ];

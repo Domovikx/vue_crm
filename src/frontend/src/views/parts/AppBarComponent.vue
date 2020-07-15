@@ -1,30 +1,40 @@
 <script lang="ts">
 import Vue from 'vue';
+
 import { mapActions, mapGetters } from 'vuex';
 
 export default Vue.extend({
   name: 'AppBarComponent',
+
   components: {},
+
   data: () => ({
     date: new Date(),
     dateInterval: 0,
   }),
+
   mounted() {
     this.dateInterval = setInterval((): void => {
       this.date = new Date();
     });
   },
+
   beforeDestroy() {
     clearInterval(this.dateInterval);
   },
+
   computed: {
-    ...mapGetters(['navigationDrawerGetter']),
+    ...mapGetters(['navigationDrawerGetter', 'infoUserNameGetter']),
   },
+
   methods: {
-    ...mapActions(['navigationDrawerAction']),
-    logout() {
+    ...mapActions(['navigationDrawerAction', 'logoutAction']),
+
+    async logout() {
+      await this.logoutAction();
       this.$router.push('/login?message=logout');
     },
+
     clickBurgerMenu() {
       this.navigationDrawerAction(this.navigationDrawerGetter);
     },
@@ -51,7 +61,7 @@ export default Vue.extend({
           v-bind="attrs"
           v-on="on"
         >
-          USER NAME
+          {{ infoUserNameGetter || 'anonym' }}
         </v-btn>
       </template>
       <v-list class="user-menu-list">

@@ -1,10 +1,13 @@
 <script lang="ts">
 import Vue from 'vue';
+
 import { mapGetters, mapActions } from 'vuex';
 
 export default Vue.extend({
   name: 'NavigationDrawerComponent',
+
   props: ['value'],
+
   computed: {
     ...mapGetters(['navigationDrawerGetter']),
 
@@ -19,6 +22,7 @@ export default Vue.extend({
       },
     },
   },
+
   data: (): any => ({
     items: [
       { title: 'Счет', url: '/', exact: true },
@@ -28,6 +32,7 @@ export default Vue.extend({
       { title: 'Категории', url: '/categories' },
     ],
   }),
+
   methods: {
     ...mapActions(['navigationDrawerAction']),
   },

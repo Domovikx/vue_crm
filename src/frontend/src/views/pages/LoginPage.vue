@@ -1,9 +1,13 @@
 <script lang="ts">
 import Vue from 'vue';
-import { email, required, minLength } from 'vuelidate/lib/validators';
+
+import { mapActions, mapGetters, mapMutations } from 'vuex';
+
+import commonMessages from '../../utils/commonMessages';
 
 export default Vue.extend({
   name: 'LoginPage',
+
   data: () => ({
     valid: true,
     lazy: false,
@@ -11,28 +15,61 @@ export default Vue.extend({
     email: '',
     emailRules: [
       (v: string) => !!v || 'E-mail нужно заполнить',
-      (v: string) => /.+@.+\..+/.test(v) || 'E-mail должен быть правильным',
+      (v: string) =>
+        /^[A-Z0-9._%+-]+@[A-Z0-9-]+.+.[A-Z]{2,4}$/i.test(v) ||
+        'E-mail должен быть правильным',
     ],
 
     password: '',
     passwordShow: false,
-    passwordLength: 4,
     passwordRules: [
       (v: string) => !!v || 'Password нужно заполнить',
-      (v: string) =>
-        // TODO: подумать как привязать passwordLength
-        (v && v.length >= 4) ||
-        `Длинна пароля должна быть больше ${4} символов`,
+      (v: string, passwordLength: number = 6) =>
+        (v && v.length >= passwordLength) ||
+        `Длинна пароля должна быть больше ${passwordLength} символов`,
     ],
 
-    checkbox: false,
-    checkboxRules: [(v: string) => !!v || 'Просто согласись с неизбежностью!'],
+    message: '',
+    messages: commonMessages,
   }),
 
+  computed: {
+    ...mapGetters(['errorNotificationGetter']),
+  },
+
+  watch: {
+    errorNotificationGetter(fbError) {
+      if (fbError) {
+        const messages: any = this.messages;
+        const code: string = fbError.code;
+        const message = messages[code];
+        this.message = message;
+      } else {
+        this.message = '';
+        this.clearErrorNotificationMutation;
+      }
+    },
+  },
+
   methods: {
-    onSubmit() {
-      console.log('onSubmit ');
-      this.$router.push('/');
+    ...mapActions(['loginAction']),
+
+    // TODO clearErrorNotificationMutation не работает как ожидалось
+    ...mapMutations(['clearErrorNotificationMutation']),
+
+    async onLogin() {
+      const loginFormData = {
+        email: this.email,
+        password: this.password,
+      };
+
+      try {
+        await this.loginAction(loginFormData);
+        this.clearErrorNotificationMutation;
+        this.$router.push('/');
+      } catch (error) {
+        throw error;
+      }
     },
   },
 });
@@ -44,7 +81,7 @@ export default Vue.extend({
       <v-col cols="12" sm="8" md="4">
         <v-card class="elevation-12">
           <v-toolbar class="title primary white--text" flat>
-            <v-toolbar-title>Login form</v-toolbar-title>
+            <v-toolbar-title>Shadow accounting</v-toolbar-title>
             <v-spacer></v-spacer>
             <v-btn class="primary white--text" to="/">X</v-btn>
           </v-toolbar>
@@ -74,13 +111,6 @@ export default Vue.extend({
                 name="password"
                 prepend-icon="mdi-lock"
               ></v-text-field>
-
-              <v-checkbox
-                v-model="checkbox"
-                :rules="checkboxRules"
-                label="Вы согласны с правилами?"
-                required
-              ></v-checkbox>
             </v-form>
           </v-card-text>
 
@@ -90,11 +120,17 @@ export default Vue.extend({
               block
               class="primary white--text"
               :disabled="!valid"
-              @click="onSubmit"
+              @click="onLogin"
             >
-              Login
+              Войти
             </v-btn>
           </v-card-actions>
+
+          <v-layout justify-center v-if="message">
+            <v-card-actions class="message">
+              {{ message }}
+            </v-card-actions>
+          </v-layout>
 
           <v-card-actions>
             <p class="card_register">
@@ -122,5 +158,8 @@ export default Vue.extend({
 }
 .v-card__actions {
   padding: 8px 16px;
+}
+.message {
+  color: red;
 }
 </style>

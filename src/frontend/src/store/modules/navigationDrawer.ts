@@ -10,8 +10,8 @@ const navigationDrawer = {
   },
 
   mutations: {
-    navigationDrawerMutation: (state: any, navigationDrawer: boolean) => {
-      state.navigationDrawer = navigationDrawer;
+    navigationDrawerMutation: (state: any, payload: boolean) => {
+      state.navigationDrawer = payload;
     },
   },
 

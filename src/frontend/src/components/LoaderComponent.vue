@@ -1,20 +1,30 @@
 <script lang="ts">
 import Vue from 'vue';
+
 export default Vue.extend({
   name: 'LoaderComponent',
 });
 </script>
 
 <template>
-  <div class="lds-ring">
-    <div></div>
-    <div></div>
-    <div></div>
-    <div></div>
+  <div class="wrapper">
+    <div class="lds-ring">
+      <div></div>
+      <div></div>
+      <div></div>
+      <div></div>
+    </div>
   </div>
 </template>
 
 <style lang="scss" scoped>
+.wrapper {
+  display: grid;
+  justify-content: center;
+  height: 100%;
+  align-content: center;
+}
+
 .lds-ring {
   display: inline-block;
   position: relative;

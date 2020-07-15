@@ -14,10 +14,10 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
 
 importScripts(
-  "/precache-manifest.a336c1b9aacd211f11d0a81f26fba7af.js"
+  "/precache-manifest.e5b329ee33ba1397d267d5cc08be0ead.js"
 );
 
-workbox.core.setCacheNameDetails({prefix: "frontend_v2"});
+workbox.core.setCacheNameDetails({prefix: "shadow_accounting"});
 
 self.addEventListener('message', (event) => {
   if (event.data && event.data.type === 'SKIP_WAITING') {

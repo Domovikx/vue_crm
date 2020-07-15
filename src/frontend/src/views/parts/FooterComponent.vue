@@ -6,9 +6,9 @@ export default Vue.extend({
 </script>
 
 <template>
-  <v-footer app class="primary white--text">
+  <!-- <v-footer app class="primary white--text">
     <p>Footer</p>
-  </v-footer>
+  </v-footer> -->
 </template>
 
 <style lang="scss" scoped></style>

@@ -24,6 +24,8 @@
 		"noreferrer",
 		"nuxt",
 		"prefetch",
+		"tbody",
+		"thead",
 		"vuelidate",
 		"vuetify",
 		"xlink"
