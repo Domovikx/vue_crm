@@ -66,8 +66,23 @@ const category = {
           .ref(`/users/${uid}/categories`)
           .child(id || '')
           .update({ title, limit });
+      } catch (error) {
+        throw error;
+      }
+    },
 
-        // dispatch('fetchCategoriesAction');
+    async removeCategoryAction(
+      { getters }: ActionContext,
+      { id }: UserCategory,
+    ) {
+      try {
+        const uid = await getters.uidGetter;
+
+        await firebase
+          .database()
+          .ref(`/users/${uid}/categories`)
+          .child(id || '')
+          .remove();
       } catch (error) {
         throw error;
       }
