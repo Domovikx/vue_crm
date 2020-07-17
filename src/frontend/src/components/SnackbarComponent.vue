@@ -25,6 +25,7 @@ export default Vue.extend({
       () => {
         const msg = this.snackbarStateGetter;
         if (msg !== null) {
+          this.snackTime(msg);
           this.snackbarMutation(null);
         }
       },
@@ -44,6 +45,15 @@ export default Vue.extend({
   methods: {
     ...mapMutations(['snackbarMutation']),
 
+    checkRoute: function (): void {
+      const messages: any = this.messages;
+      const routeQuery: any = this.$route.query;
+      if (messages[routeQuery.message]) {
+        const message = messages[routeQuery.message];
+        this.snackTime(message);
+      }
+    },
+
     snackTime: function (
       message: string = 'Что-то пошло не так.',
       color: string = 'info',
@@ -53,16 +63,8 @@ export default Vue.extend({
       this.message = message;
       this.color = color;
       this.timeout = timeout;
-      this.snackbarMutation(message);
-    },
 
-    checkRoute: function (): void {
-      const messages: any = this.messages;
-      const routeQuery: any = this.$route.query;
-      if (messages[routeQuery.message]) {
-        const message = messages[routeQuery.message];
-        this.snackTime(message);
-      }
+      this.snackbarMutation(message);
     },
   },
 });

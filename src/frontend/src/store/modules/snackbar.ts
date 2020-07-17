@@ -4,8 +4,8 @@ const snackbar = {
   },
 
   mutations: {
-    snackbarMutation: (state: any, payload: any) => {
-      state.snackbarState = payload;
+    snackbarMutation: (state: any, message: string) => {
+      state.snackbarState = message;
     },
   },
 

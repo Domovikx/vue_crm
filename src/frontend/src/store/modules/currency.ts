@@ -12,7 +12,7 @@ Cur_OfficialRate: 3.4012
 
 */
 
-import { ActionContext } from '@/interfaces/ActionContext.interface';
+import ActionContext from '@/interfaces/ActionContext.interface';
 
 const currency = {
   state: {

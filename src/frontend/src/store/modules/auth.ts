@@ -4,8 +4,8 @@ https://vuecrm200711.firebaseio.com/
 
 import firebase from 'firebase/app';
 
-import { ActionContext } from '@/interfaces/ActionContext.interface';
-import { RegistrationData } from '@/interfaces/RegistrationData.interface';
+import ActionContext from '@/interfaces/ActionContext.interface';
+import RegistrationData from '@/interfaces/RegistrationData.interface';
 
 const auth = {
   state: {

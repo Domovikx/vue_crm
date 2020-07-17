@@ -1,6 +1,6 @@
 import { Dispatch, Commit } from 'vuex';
 
-export interface ActionContext {
+interface ActionContext {
   dispatch?: Dispatch | any;
   commit?: Commit | any;
   state?: any;
@@ -8,3 +8,5 @@ export interface ActionContext {
   rootState?: any;
   rootGetters?: any;
 }
+
+export default ActionContext;

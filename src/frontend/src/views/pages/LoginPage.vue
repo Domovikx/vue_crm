@@ -46,16 +46,12 @@ export default Vue.extend({
         this.message = message;
       } else {
         this.message = '';
-        this.clearErrorNotificationMutation;
       }
     },
   },
 
   methods: {
     ...mapActions(['loginAction']),
-
-    // TODO clearErrorNotificationMutation не работает как ожидалось
-    ...mapMutations(['clearErrorNotificationMutation']),
 
     async onLogin() {
       const loginFormData = {
@@ -65,7 +61,6 @@ export default Vue.extend({
 
       try {
         await this.loginAction(loginFormData);
-        this.clearErrorNotificationMutation;
         this.$router.push('/');
       } catch (error) {
         throw error;
@@ -87,7 +82,7 @@ export default Vue.extend({
           </v-toolbar>
 
           <v-card-text>
-            <v-form ref="form" v-model="valid" :lazy-validation="lazy">
+            <v-form ref="form" v-model="valid">
               <v-text-field
                 required
                 v-model="email"

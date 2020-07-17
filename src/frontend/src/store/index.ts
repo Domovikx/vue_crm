@@ -7,6 +7,7 @@ import auth from './modules/auth';
 import errorNotification from './modules/errorNotification';
 import info from './modules/info';
 import currency from './modules/currency';
+import category from './modules/category';
 
 Vue.use(Vuex);
 
@@ -18,5 +19,6 @@ export default new Vuex.Store({
     errorNotification,
     info,
     currency,
+    category,
   },
 });
