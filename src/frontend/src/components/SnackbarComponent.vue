@@ -57,7 +57,7 @@ export default Vue.extend({
     snackTime: function (
       message: string = 'Что-то пошло не так.',
       color: string = 'info',
-      timeout: number = 2500,
+      timeout: number = 5000,
     ): void {
       this.snackbar = true;
       this.message = message;
