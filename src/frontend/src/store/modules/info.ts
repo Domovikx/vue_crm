@@ -23,6 +23,22 @@ const info = {
         throw error;
       }
     },
+
+    async infoUpdateBillAction(
+      { dispatch, commit, getters }: ActionContext,
+      { bill }: any,
+    ) {
+      try {
+        const uid = await getters.uidGetter;
+        const info = await getters.infoGetter;
+        const updateData = { ...info, bill };
+        await firebase.database().ref(`/users/${uid}/info`).update(updateData);
+
+        commit('setInfoMutation', updateData);
+      } catch (error) {
+        throw error;
+      }
+    },
   },
 
   mutations: {
@@ -36,8 +52,8 @@ const info = {
 
   getters: {
     infoGetter: (state: any) => state.info,
-    infoUserNameGetter: (state: any) => state.info.name || null,
-    infoBillGetter: (state: any) => state.info.bill || null,
+    infoUserNameGetter: (state: any) => state.info.name,
+    infoBillGetter: (state: any) => state.info.bill,
   },
 };
 

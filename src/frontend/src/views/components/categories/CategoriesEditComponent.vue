@@ -17,7 +17,6 @@ export default Vue.extend({
     valid: false,
 
     items: [],
-    rulesItems: [],
     select: {},
     selectId: null,
 

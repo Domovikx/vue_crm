@@ -100,6 +100,8 @@ router.beforeEach((to, from, next) => {
   } else {
     next();
   }
+
+  // TODO: защита роутов не полная можно войти в соседней вкладке. баг.
 });
 
 export default router;
