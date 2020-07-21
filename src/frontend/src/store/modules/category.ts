@@ -14,7 +14,7 @@ const category = {
 
   actions: {
     async createCategoryAction(
-      { getters }: ActionContext,
+      { getters, dispatch }: ActionContext,
       { limit, title }: UserCategory,
     ) {
       try {
@@ -23,6 +23,8 @@ const category = {
           .database()
           .ref(`/users/${uid}/categories`)
           .push({ limit, title });
+
+        await dispatch('fetchCategoriesAction');
       } catch (error) {
         throw error;
       }
@@ -66,6 +68,8 @@ const category = {
           .ref(`/users/${uid}/categories`)
           .child(id || '')
           .update({ title, limit });
+
+        await dispatch('fetchCategoriesAction');
       } catch (error) {
         throw error;
       }

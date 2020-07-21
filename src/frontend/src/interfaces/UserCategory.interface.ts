@@ -1,5 +1,5 @@
 interface UserCategory {
-  id?: string | null;
+  id?: any;
   title?: any;
   limit?: any;
 }

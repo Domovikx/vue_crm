@@ -16,7 +16,7 @@ export default Vue.extend({
     loading: true,
     valid: false,
 
-    items: [],
+    // items: [],
     select: {},
     selectId: null,
 
@@ -36,6 +36,10 @@ export default Vue.extend({
 
   computed: {
     ...mapGetters(['categoriesGetter']),
+
+    items(): any {
+      return this.categoriesGetter;
+    },
   },
 
   created() {
@@ -77,7 +81,7 @@ export default Vue.extend({
         this.loading = true;
 
         await this.$store.dispatch('updateCategoriesAction', categoryData);
-        await this.$store.dispatch('fetchCategoriesAction');
+
         this.items = this.categoriesGetter;
 
         this.loading = false;

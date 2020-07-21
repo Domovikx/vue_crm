@@ -20,20 +20,9 @@ export default Vue.extend({
     loading: true,
   }),
 
-  mounted() {
-    this.onLoading();
-  },
-
-  computed: {
-    // ...mapGetters(['categoriesGetter']),
-  },
-
-  methods: {
-    async onLoading() {
-      this.loading = true;
-      await this.$store.dispatch('fetchCategoriesAction');
-      this.loading = false;
-    },
+  async mounted() {
+    await this.$store.dispatch('fetchCategoriesAction');
+    this.loading = false;
   },
 });
 </script>

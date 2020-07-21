@@ -1,7 +1,7 @@
 <script lang="ts">
 import Vue from 'vue';
 
-import { mapGetters } from 'vuex';
+import { mapGetters, mapActions } from 'vuex';
 
 import LoaderComponent from '../../components/LoaderComponent.vue';
 import Record from '../../interfaces/Record.interface';
@@ -17,11 +17,10 @@ export default Vue.extend({
     loading: true,
     valid: false,
 
-    items: [],
-    select: {},
     selectId: null,
 
     categoryType: 'outcome',
+    categoryTypeRules: [(v: string) => !!v || 'Это поле нужно заполнить'],
 
     count: null,
     countRules: [
@@ -37,29 +36,32 @@ export default Vue.extend({
   computed: {
     ...mapGetters(['categoriesGetter', 'infoBillGetter', 'currencyBaseGetter']),
 
-    bill: function () {
+    bill: function (): any {
       return this.infoBillGetter;
     },
 
-    currencyBase: function () {
+    currencyBase: function (): any {
       return this.currencyBaseGetter;
+    },
+
+    items: function (): any {
+      return this.categoriesGetter;
     },
   },
 
-  created() {
-    this.items = this.categoriesGetter;
+  async mounted() {
+    if (!this.categoriesGetter) {
+      await this.fetchCategoriesAction();
+    }
 
-    const select: any = this.items[0] || null;
-
-    this.select = select || null;
-    this.selectId = select.id;
-  },
-
-  mounted() {
+    const items: any = this.items;
+    this.selectId = items[0].id;
     this.loading = false;
   },
 
   methods: {
+    ...mapActions(['fetchCategoriesAction']),
+
     async createRecord() {
       try {
         const record: Record = {
@@ -98,15 +100,16 @@ export default Vue.extend({
   <LoaderComponent v-if="loading" />
 
   <div v-else-if="!loading">
-    <v-card-action>
+    <v-card-actions>
       <h2>Новая запись</h2>
-      <p>Остаток на счёте: {{ bill }} {{ currencyBase }}</p>
-    </v-card-action>
+      <v-spacer></v-spacer>
+      <p class="bill">{{ bill | currencyFilter(currencyBase) }}</p>
+    </v-card-actions>
 
     <v-form ref="form" v-model="valid">
       <div class="input-field">
         <v-select
-          v-model="select"
+          v-model="selectId"
           :items="items"
           item-text="title"
           item-value="id"
@@ -114,7 +117,11 @@ export default Vue.extend({
         ></v-select>
       </div>
 
-      <v-radio-group v-model="categoryType" :mandatory="false">
+      <v-radio-group
+        v-model="categoryType"
+        :mandatory="false"
+        :rules="categoryTypeRules"
+      >
         <v-radio label="Расход" value="outcome"></v-radio>
         <v-radio label="Доход" value="income"></v-radio>
       </v-radio-group>
@@ -142,4 +149,8 @@ export default Vue.extend({
   </div>
 </template>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.bill {
+  font-size: 1.5em;
+}
+</style>

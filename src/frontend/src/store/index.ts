@@ -9,6 +9,7 @@ import info from './modules/info';
 import currency from './modules/currency';
 import category from './modules/category';
 import record from './modules/record';
+import plannings from './modules/plannings';
 
 Vue.use(Vuex);
 
@@ -22,5 +23,6 @@ export default new Vuex.Store({
     currency,
     category,
     record,
+    plannings,
   },
 });
