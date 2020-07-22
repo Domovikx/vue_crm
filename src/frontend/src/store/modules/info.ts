@@ -12,20 +12,31 @@ const info = {
   },
 
   actions: {
-    async fetchInfoAction({ dispatch, commit, getters }: ActionContext) {
+    async fetchInfoAction({ commit, getters }: ActionContext) {
       try {
-        const uid = await getters.uidGetter;
-        const info = (
-          await firebase.database().ref(`/users/${uid}/info`).once('value')
-        ).val();
-        commit('setInfoMutation', info);
+        let uid = await getters.uidGetter;
+
+        if (!uid) {
+          const localUid = localStorage.getItem('uid');
+          if (localUid) {
+            uid = localUid;
+            commit('setUidMutation', uid);
+          }
+        }
+
+        if (uid) {
+          const info = (
+            await firebase.database().ref(`/users/${uid}/info`).once('value')
+          ).val();
+          commit('setInfoMutation', info);
+        }
       } catch (error) {
         throw error;
       }
     },
 
     async infoUpdateBillAction(
-      { dispatch, commit, getters }: ActionContext,
+      { commit, getters }: ActionContext,
       { bill }: any,
     ) {
       try {

@@ -11,14 +11,11 @@ export default Vue.extend({
   data: () => ({
     date: new Date(),
     dateInterval: 0,
-
-    userName: 'anonym',
   }),
 
   async mounted() {
     if (!this.infoUserNameGetter) {
       await this.fetchInfoAction();
-      this.userName = this.infoUserNameGetter;
     }
 
     this.dateInterval = setInterval((): void => {
@@ -32,6 +29,10 @@ export default Vue.extend({
 
   computed: {
     ...mapGetters(['navigationDrawerGetter', 'infoUserNameGetter']),
+
+    userName(): any {
+      return this.infoUserNameGetter;
+    },
   },
 
   methods: {
