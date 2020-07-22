@@ -54,11 +54,11 @@ export default Vue.extend({
   <LoaderComponent v-if="loading" />
 
   <div v-else-if="!loading">
-    <v-card-actions>
-      <h2>Планирование</h2>
+    <v-card-title>
+      Планирование
       <v-spacer></v-spacer>
-      <p class="bill">{{ bill | currencyFilter(currencyBase) }}</p>
-    </v-card-actions>
+      {{ bill | currencyFilter(currencyBase) }}
+    </v-card-title>
 
     <div v-for="item in items" :key="item.categoryId">
       <v-card-actions>
@@ -78,8 +78,4 @@ export default Vue.extend({
   </div>
 </template>
 
-<style lang="scss" scoped>
-.bill {
-  font-size: 1.5em;
-}
-</style>
+<style lang="scss" scoped></style>

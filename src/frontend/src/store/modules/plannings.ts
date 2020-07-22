@@ -1,7 +1,10 @@
 import ActionContext from '@/interfaces/ActionContext.interface';
-import Record from '@/interfaces/Record.interface';
-import UserCategory from '@/interfaces/UserCategory.interface';
-import { PlanningByCategory } from '@/interfaces/PlanningByCategory.interface';
+import { Record, Records } from '@/interfaces/Record.interface';
+import { UserCategory, Categories } from '@/interfaces/Category.interface';
+import {
+  PlanningByCategory,
+  PlanningsByCategories,
+} from '@/interfaces/PlanningByCategory.interface';
 
 const plannings = {
   state: {
@@ -19,11 +22,11 @@ const plannings = {
           await dispatch('fetchRecordsAction');
         }
 
-        const categories: any = getters.categoriesGetter;
-        const records: any = getters.recordsGetter;
-        const bill: any = getters.infoBillGetter;
+        const categories: Categories = getters.categoriesGetter;
+        const records: Records = getters.recordsGetter;
+        const bill: number = getters.infoBillGetter;
 
-        const planningsByCategories: PlanningByCategory = await categories.map(
+        const planningsByCategories: PlanningsByCategories = await categories.map(
           (category: UserCategory) => {
             const planningByCategory: PlanningByCategory = {
               categoryId: String(category.id),
@@ -75,13 +78,17 @@ const plannings = {
   },
 
   mutations: {
-    planningsByCategoriesMutation: (state: any, categories: any) => {
+    planningsByCategoriesMutation: (
+      state: any,
+      categories: PlanningsByCategories,
+    ) => {
       state.categories = categories;
     },
   },
 
   getters: {
-    planningsByCategoriesGetter: (state: any) => state.categories,
+    planningsByCategoriesGetter: (state: any): PlanningsByCategories =>
+      state.categories,
   },
 };
 

@@ -4,7 +4,7 @@ import Vue from 'vue';
 import { mapGetters, mapActions } from 'vuex';
 
 import LoaderComponent from '../../components/LoaderComponent.vue';
-import Record from '../../interfaces/Record.interface';
+import { Record } from '../../interfaces/Record.interface';
 
 export default Vue.extend({
   name: 'RecordPage',
@@ -100,11 +100,11 @@ export default Vue.extend({
   <LoaderComponent v-if="loading" />
 
   <div v-else-if="!loading">
-    <v-card-actions>
-      <h2>Новая запись</h2>
+    <v-card-title>
+      Новая запись
       <v-spacer></v-spacer>
-      <p class="bill">{{ bill | currencyFilter(currencyBase) }}</p>
-    </v-card-actions>
+      {{ bill | currencyFilter(currencyBase) }}
+    </v-card-title>
 
     <v-form ref="form" v-model="valid">
       <div class="input-field">
@@ -149,8 +149,4 @@ export default Vue.extend({
   </div>
 </template>
 
-<style lang="scss" scoped>
-.bill {
-  font-size: 1.5em;
-}
-</style>
+<style lang="scss" scoped></style>

@@ -16,14 +16,6 @@ const routes: Array<RouteConfig> = [
     meta: { layout: 'EmptyLayout' },
   },
 
-  // test
-  {
-    path: '/SnackTest',
-    name: 'SnackTest',
-    component: () => import('../views/pages/SnackTestPage.vue'),
-    meta: { layout: 'EmptyLayout' },
-  },
-
   // EmptyLayout
   // Login / Register
   {

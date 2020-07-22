@@ -2,8 +2,9 @@
 import Vue from 'vue';
 
 import { mapGetters } from 'vuex';
-import UserCategory from '../../../interfaces/UserCategory.interface';
+
 import LoaderComponent from '../../../components/LoaderComponent.vue';
+import { UserCategory } from '../../../interfaces/Category.interface';
 
 export default Vue.extend({
   name: 'CategoriesEditComponent',

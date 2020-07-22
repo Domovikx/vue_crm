@@ -55,13 +55,13 @@ export default Vue.extend({
 
 <template>
   <div>
-    <v-card-actions>
-      <h2>Счет ({{ bill | currencyFilter(currencyBase) }})</h2>
+    <v-card-title>
+      Счет ({{ bill | currencyFilter(currencyBase) }})
       <v-spacer></v-spacer>
       <v-btn color="secondary" @click="refresh">
         обновить
       </v-btn>
-    </v-card-actions>
+    </v-card-title>
 
     <LoaderComponent v-if="loading" />
 

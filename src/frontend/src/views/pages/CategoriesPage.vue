@@ -31,9 +31,9 @@ export default Vue.extend({
   <LoaderComponent v-if="loading" />
 
   <div v-else-if="!loading">
-    <v-card-actions>
-      <h2>Категории</h2>
-    </v-card-actions>
+    <v-card-title>
+      Категории
+    </v-card-title>
 
     <div class="row">
       <CategoriesCreateComponent />

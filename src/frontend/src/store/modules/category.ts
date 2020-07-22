@@ -5,7 +5,7 @@ https://vuecrm200711.firebaseio.com/
 import firebase from 'firebase/app';
 
 import ActionContext from '@/interfaces/ActionContext.interface';
-import UserCategory from '@/interfaces/UserCategory.interface';
+import { UserCategory } from '@/interfaces/Category.interface';
 
 const category = {
   state: {

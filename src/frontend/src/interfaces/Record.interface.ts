@@ -1,9 +1,10 @@
-interface Record {
-  categoryId?: any;
-  count?: any;
-  description?: any;
-  categoryType?: any;
-  date?: any;
+export interface Record {
+  id?: string | any;
+  categoryId?: string | any;
+  categoryType?: string | any;
+  count?: number | any;
+  description?: string | any;
+  date?: string | any;
 }
 
-export default Record;
+export interface Records extends Array<Record> {}

@@ -5,7 +5,7 @@ https://vuecrm200711.firebaseio.com/
 import firebase from 'firebase/app';
 
 import ActionContext from '@/interfaces/ActionContext.interface';
-import Record from '@/interfaces/Record.interface';
+import { Record, Records } from '@/interfaces/Record.interface';
 
 const record = {
   state: {
@@ -14,12 +14,9 @@ const record = {
   },
 
   actions: {
-    async createRecordAction(
-      { commit, dispatch }: ActionContext,
-      record: Record,
-    ) {
+    async createRecordAction({ dispatch }: ActionContext, record: Record) {
       try {
-        const uid = await dispatch('getUidAction');
+        const uid: String = await dispatch('getUidAction');
         await firebase.database().ref(`/users/${uid}/records`).push(record);
 
         dispatch('fetchRecordsAction');
@@ -30,25 +27,27 @@ const record = {
 
     async fetchRecordsAction({ getters, commit }: ActionContext) {
       try {
-        const uid = await getters.uidGetter;
+        const uid: string = await getters.uidGetter;
 
-        const records =
+        const records: Records =
           (
             await firebase.database().ref(`/users/${uid}/records`).once('value')
           ).val() || {};
 
         const recordsKeys = Object.keys(records);
-        const recordsFormatting = recordsKeys.map((key) => {
-          const record = {
-            id: key,
-            categoryId: records[key].categoryId,
-            categoryType: records[key].categoryType,
-            count: records[key].count,
-            date: records[key].date,
-            description: records[key].description,
-          };
-          return record;
-        });
+        const recordsFormatting = recordsKeys.map(
+          (key: any): Record => {
+            const record = {
+              id: key,
+              categoryId: records[key].categoryId,
+              categoryType: records[key].categoryType,
+              count: records[key].count,
+              date: records[key].date,
+              description: records[key].description,
+            };
+            return record;
+          },
+        );
 
         commit('recordsMutation', recordsFormatting);
       } catch (error) {
@@ -58,13 +57,13 @@ const record = {
   },
 
   mutations: {
-    recordsMutation: (state: any, records: any) => {
+    recordsMutation: (state: any, records: Records) => {
       state.records = records;
     },
   },
 
   getters: {
-    recordsGetter: (state: any) => {
+    recordsGetter: (state: any): Records => {
       return state.records;
     },
   },

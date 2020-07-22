@@ -1,51 +1,68 @@
 <script lang="ts">
 import Vue from 'vue';
 
+import { mapGetters, mapActions } from 'vuex';
+
+import LoaderComponent from '../../components/LoaderComponent.vue';
+
 export default Vue.extend({
   name: 'HistoryPage',
+
+  components: {
+    LoaderComponent,
+  },
+
+  data: () => ({
+    loading: true,
+  }),
+
+  computed: {
+    ...mapGetters(['recordsGetter', 'infoBillGetter', 'currencyBaseGetter']),
+
+    bill: function (): any {
+      return this.infoBillGetter;
+    },
+
+    currencyBase: function (): any {
+      return this.currencyBaseGetter;
+    },
+
+    items: function (): any {
+      return this.recordsGetter;
+    },
+  },
+
+  async mounted() {
+    // if (!this.categoriesGetter) {
+    //   await this.fetchCategoriesAction();
+    // }
+
+    this.loading = false;
+  },
 });
 </script>
 
 <template>
-  <div>
-    <div class="page-title">
-      <h3>История записей</h3>
-    </div>
+  <LoaderComponent v-if="loading" />
 
-    <div class="history-chart">
-      <canvas></canvas>
-    </div>
-
-    <section>
-      <table>
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Сумма</th>
-            <th>Дата</th>
-            <th>Категория</th>
-            <th>Тип</th>
-            <th>Открыть</th>
-          </tr>
-        </thead>
-
-        <tbody>
-          <tr>
-            <td>1</td>
-            <td>1212</td>
-            <td>12.12.32</td>
-            <td>name</td>
-            <td>
-              <span class="white-text badge red">Расход</span>
-            </td>
-            <td>
-              <button class="btn-small btn">
-                <i class="material-icons">open_in_new</i>
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </section>
-  </div>
+  <v-card v-else-if="!loading">
+    <v-card-title>
+      История записей
+      <v-spacer></v-spacer>
+      <v-text-field
+        v-model="search"
+        append-icon="mdi-magnify"
+        label="Найти"
+        single-line
+        hide-details
+      ></v-text-field>
+    </v-card-title>
+    <v-data-table
+      :headers="headers"
+      :items="items"
+      :search="search"
+    ></v-data-table>
+  </v-card>
 </template>
+
+<style lang="scss" scoped></style>
