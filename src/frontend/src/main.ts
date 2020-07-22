@@ -6,6 +6,7 @@ import vuetify from './plugins/vuetify.plugin';
 
 import dateFilter from './filters/dateFilter';
 import currencyFilter from './filters/currencyFilter';
+import categoryTypeFilter from './filters/categoryTypeFilter';
 
 import './registerServiceWorker';
 import 'idempotent-babel-polyfill';
@@ -21,6 +22,7 @@ Vue.config.productionTip = false;
 // filters
 Vue.filter('dateFilter', dateFilter);
 Vue.filter('currencyFilter', currencyFilter);
+Vue.filter('categoryTypeFilter', categoryTypeFilter);
 
 let app: any;
 

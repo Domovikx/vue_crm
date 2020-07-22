@@ -13,7 +13,11 @@ export default Vue.extend({
     dateInterval: 0,
   }),
 
-  mounted() {
+  async mounted() {
+    if (!this.infoUserNameGetter) {
+      await this.fetchInfoAction();
+    }
+
     this.dateInterval = setInterval((): void => {
       this.date = new Date();
     });
@@ -25,10 +29,18 @@ export default Vue.extend({
 
   computed: {
     ...mapGetters(['navigationDrawerGetter', 'infoUserNameGetter']),
+
+    userName(): any {
+      return this.infoUserNameGetter;
+    },
   },
 
   methods: {
-    ...mapActions(['navigationDrawerAction', 'logoutAction']),
+    ...mapActions([
+      'navigationDrawerAction',
+      'logoutAction',
+      'fetchInfoAction',
+    ]),
 
     async logout() {
       await this.logoutAction();
@@ -61,7 +73,7 @@ export default Vue.extend({
           v-bind="attrs"
           v-on="on"
         >
-          {{ infoUserNameGetter || 'anonym' }}
+          {{ userName }}
         </v-btn>
       </template>
       <v-list class="user-menu-list">

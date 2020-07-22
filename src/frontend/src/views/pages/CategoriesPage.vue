@@ -20,20 +20,9 @@ export default Vue.extend({
     loading: true,
   }),
 
-  mounted() {
-    this.onLoading();
-  },
-
-  computed: {
-    // ...mapGetters(['categoriesGetter']),
-  },
-
-  methods: {
-    async onLoading() {
-      this.loading = true;
-      await this.$store.dispatch('fetchCategoriesAction');
-      this.loading = false;
-    },
+  async mounted() {
+    await this.$store.dispatch('fetchCategoriesAction');
+    this.loading = false;
   },
 });
 </script>
@@ -42,9 +31,9 @@ export default Vue.extend({
   <LoaderComponent v-if="loading" />
 
   <div v-else-if="!loading">
-    <v-card-actions>
-      <h2>Категории</h2>
-    </v-card-actions>
+    <v-card-title>
+      Категории
+    </v-card-title>
 
     <div class="row">
       <CategoriesCreateComponent />

@@ -1,7 +1,7 @@
 <script lang="ts">
 import Vue from 'vue';
 
-import { mapActions, mapMutations, mapGetters } from 'vuex';
+import { mapActions, mapGetters } from 'vuex';
 
 import HomeBillComponent from '../components/home/HomeBillComponent.vue';
 import HomeCurrencyComponent from '../components/home/HomeCurrencyComponent.vue';
@@ -18,16 +18,26 @@ export default Vue.extend({
 
   data: () => ({
     loading: true,
-    currency: null,
   }),
 
   computed: {
-    ...mapGetters(['currenciesGetter', 'currencyBaseGetter']),
+    ...mapGetters(['currenciesGetter', 'currencyBaseGetter', 'infoBillGetter']),
+
+    currency(): any {
+      return this.currenciesGetter;
+    },
+
+    currencyBase(): any {
+      return this.currencyBaseGetter;
+    },
+
+    bill(): any {
+      return this.infoBillGetter;
+    },
   },
 
   async mounted() {
     await this.currencyFetchAction();
-    this.currency = await this.currenciesGetter;
     this.loading = false;
   },
 
@@ -45,13 +55,13 @@ export default Vue.extend({
 
 <template>
   <div>
-    <v-card-actions>
-      <h2>Счет ({{ currencyBaseGetter }})</h2>
+    <v-card-title>
+      Счет ({{ bill | currencyFilter(currencyBase) }})
       <v-spacer></v-spacer>
       <v-btn color="secondary" @click="refresh">
         обновить
       </v-btn>
-    </v-card-actions>
+    </v-card-title>
 
     <LoaderComponent v-if="loading" />
 

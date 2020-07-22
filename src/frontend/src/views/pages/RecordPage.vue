@@ -1,55 +1,152 @@
 <script lang="ts">
 import Vue from 'vue';
 
+import { mapGetters, mapActions } from 'vuex';
+
+import LoaderComponent from '../../components/LoaderComponent.vue';
+import { Record } from '../../interfaces/Record.interface';
+
 export default Vue.extend({
   name: 'RecordPage',
+
+  components: {
+    LoaderComponent,
+  },
+
+  data: () => ({
+    loading: true,
+    valid: false,
+
+    selectId: null,
+
+    categoryType: 'outcome',
+    categoryTypeRules: [(v: string) => !!v || 'Это поле нужно заполнить'],
+
+    count: null,
+    countRules: [
+      (v: string) => !!v || 'Это поле нужно заполнить',
+      (v: string) =>
+        /^\d+(?:[\.,]\d+)?$/.test(v) ||
+        'Это поле должно содержать только числа',
+    ],
+
+    description: null,
+  }),
+
+  computed: {
+    ...mapGetters(['categoriesGetter', 'infoBillGetter', 'currencyBaseGetter']),
+
+    bill: function (): any {
+      return this.infoBillGetter;
+    },
+
+    currencyBase: function (): any {
+      return this.currencyBaseGetter;
+    },
+
+    items: function (): any {
+      return this.categoriesGetter;
+    },
+  },
+
+  async mounted() {
+    if (!this.categoriesGetter) {
+      await this.fetchCategoriesAction();
+    }
+
+    const items: any = this.items;
+    this.selectId = items[0].id;
+    this.loading = false;
+  },
+
+  methods: {
+    ...mapActions(['fetchCategoriesAction']),
+
+    async createRecord() {
+      try {
+        const record: Record = {
+          categoryId: this.selectId,
+          count: this.count,
+          description: this.description || '',
+          categoryType: this.categoryType,
+          date: new Date().toJSON(),
+        };
+
+        await this.$store.dispatch('createRecordAction', record);
+
+        let bill = 0;
+        const b: number = Number(this.bill);
+        const c: number = Number(this.count);
+        if (this.categoryType === 'outcome') {
+          bill = b - c;
+        }
+        if (this.categoryType === 'income') {
+          bill = b + c;
+        }
+
+        await this.$store.dispatch('infoUpdateBillAction', { bill });
+
+        let f: any = this.$refs.form;
+        f.reset();
+      } catch (error) {
+        throw error;
+      }
+    },
+  },
 });
 </script>
 
 <template>
-  <div>
-    <div class="page-title">
-      <h3>Новая запись</h3>
-    </div>
+  <LoaderComponent v-if="loading" />
 
-    <form class="form">
+  <div v-else-if="!loading">
+    <v-card-title>
+      Новая запись
+      <v-spacer></v-spacer>
+      {{ bill | currencyFilter(currencyBase) }}
+    </v-card-title>
+
+    <v-form ref="form" v-model="valid">
       <div class="input-field">
-        <select>
-          <option>name cat</option>
-        </select>
-        <label>Выберите категорию</label>
+        <v-select
+          v-model="selectId"
+          :items="items"
+          item-text="title"
+          item-value="id"
+          label="Выберите категорию"
+        ></v-select>
       </div>
 
-      <p>
-        <label>
-          <input class="with-gap" name="type" type="radio" value="income" />
-          <span>Доход</span>
-        </label>
-      </p>
+      <v-radio-group
+        v-model="categoryType"
+        :mandatory="false"
+        :rules="categoryTypeRules"
+      >
+        <v-radio label="Расход" value="outcome"></v-radio>
+        <v-radio label="Доход" value="income"></v-radio>
+      </v-radio-group>
 
-      <p>
-        <label>
-          <input class="with-gap" name="type" type="radio" value="outcome" />
-          <span>Расход</span>
-        </label>
-      </p>
+      <v-text-field
+        v-model.trim="count"
+        label="Счет / Общая сумма"
+        :rules="countRules"
+        required
+      ></v-text-field>
 
-      <div class="input-field">
-        <input id="amount" type="number" />
-        <label for="amount">Сумма</label>
-        <span class="helper-text invalid">amount пароль</span>
-      </div>
+      <v-text-field v-model.trim="description" label="Описание"></v-text-field>
 
-      <div class="input-field">
-        <input id="description" type="text" />
-        <label for="description">Описание</label>
-        <span class="helper-text invalid">description пароль</span>
-      </div>
-
-      <button class="btn waves-effect waves-light" type="submit">
-        Создать
-        <i class="material-icons right">send</i>
-      </button>
-    </form>
+      <v-card-actions>
+        <v-btn
+          block
+          color="info"
+          @click.prevent="createRecord"
+          :disabled="!valid"
+        >
+          Создать
+        </v-btn>
+      </v-card-actions>
+    </v-form>
   </div>
 </template>
+
+<style lang="scss" scoped></style>

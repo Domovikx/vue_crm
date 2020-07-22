@@ -5,7 +5,7 @@ https://vuecrm200711.firebaseio.com/
 import firebase from 'firebase/app';
 
 import ActionContext from '@/interfaces/ActionContext.interface';
-import UserCategory from '@/interfaces/UserCategory.interface';
+import { UserCategory } from '@/interfaces/Category.interface';
 
 const category = {
   state: {
@@ -14,7 +14,7 @@ const category = {
 
   actions: {
     async createCategoryAction(
-      { getters }: ActionContext,
+      { getters, dispatch }: ActionContext,
       { limit, title }: UserCategory,
     ) {
       try {
@@ -23,6 +23,8 @@ const category = {
           .database()
           .ref(`/users/${uid}/categories`)
           .push({ limit, title });
+
+        await dispatch('fetchCategoriesAction');
       } catch (error) {
         throw error;
       }
@@ -67,7 +69,24 @@ const category = {
           .child(id || '')
           .update({ title, limit });
 
-        // dispatch('fetchCategoriesAction');
+        await dispatch('fetchCategoriesAction');
+      } catch (error) {
+        throw error;
+      }
+    },
+
+    async removeCategoryAction(
+      { getters }: ActionContext,
+      { id }: UserCategory,
+    ) {
+      try {
+        const uid = await getters.uidGetter;
+
+        await firebase
+          .database()
+          .ref(`/users/${uid}/categories`)
+          .child(id || '')
+          .remove();
       } catch (error) {
         throw error;
       }

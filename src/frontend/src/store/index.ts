@@ -8,6 +8,9 @@ import errorNotification from './modules/errorNotification';
 import info from './modules/info';
 import currency from './modules/currency';
 import category from './modules/category';
+import record from './modules/record';
+import plannings from './modules/plannings';
+import history from './modules/history';
 
 Vue.use(Vuex);
 
@@ -20,5 +23,8 @@ export default new Vuex.Store({
     info,
     currency,
     category,
+    record,
+    plannings,
+    history,
   },
 });

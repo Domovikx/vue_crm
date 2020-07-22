@@ -12,13 +12,40 @@ const info = {
   },
 
   actions: {
-    async fetchInfoAction({ dispatch, commit, getters }: ActionContext) {
+    async fetchInfoAction({ commit, getters }: ActionContext) {
+      try {
+        let uid = await getters.uidGetter;
+
+        if (!uid) {
+          const localUid = localStorage.getItem('uid');
+          if (localUid) {
+            uid = localUid;
+            commit('setUidMutation', uid);
+          }
+        }
+
+        if (uid) {
+          const info = (
+            await firebase.database().ref(`/users/${uid}/info`).once('value')
+          ).val();
+          commit('setInfoMutation', info);
+        }
+      } catch (error) {
+        throw error;
+      }
+    },
+
+    async infoUpdateBillAction(
+      { commit, getters }: ActionContext,
+      { bill }: any,
+    ) {
       try {
         const uid = await getters.uidGetter;
-        const info = (
-          await firebase.database().ref(`/users/${uid}/info`).once('value')
-        ).val();
-        commit('setInfoMutation', info);
+        const info = await getters.infoGetter;
+        const updateData = { ...info, bill };
+        await firebase.database().ref(`/users/${uid}/info`).update(updateData);
+
+        commit('setInfoMutation', updateData);
       } catch (error) {
         throw error;
       }
@@ -36,8 +63,8 @@ const info = {
 
   getters: {
     infoGetter: (state: any) => state.info,
-    infoUserNameGetter: (state: any) => state.info.name || null,
-    infoBillGetter: (state: any) => state.info.bill || null,
+    infoUserNameGetter: (state: any) => state.info.name,
+    infoBillGetter: (state: any) => state.info.bill,
   },
 };
 

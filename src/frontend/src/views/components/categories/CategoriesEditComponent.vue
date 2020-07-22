@@ -2,8 +2,9 @@
 import Vue from 'vue';
 
 import { mapGetters } from 'vuex';
-import UserCategory from '../../../interfaces/UserCategory.interface';
+
 import LoaderComponent from '../../../components/LoaderComponent.vue';
+import { UserCategory } from '../../../interfaces/Category.interface';
 
 export default Vue.extend({
   name: 'CategoriesEditComponent',
@@ -16,8 +17,7 @@ export default Vue.extend({
     loading: true,
     valid: false,
 
-    items: [],
-    rulesItems: [],
+    // items: [],
     select: {},
     selectId: null,
 
@@ -37,6 +37,10 @@ export default Vue.extend({
 
   computed: {
     ...mapGetters(['categoriesGetter']),
+
+    items(): any {
+      return this.categoriesGetter;
+    },
   },
 
   created() {
@@ -44,7 +48,7 @@ export default Vue.extend({
 
     const select: any = this.items[0] || null;
 
-    this.select = select || 'Нет категорий';
+    this.select = select || null;
     this.title = select.title;
     this.limit = select.limit;
     this.selectId = select.id;
@@ -78,12 +82,39 @@ export default Vue.extend({
         this.loading = true;
 
         await this.$store.dispatch('updateCategoriesAction', categoryData);
-        await this.$store.dispatch('fetchCategoriesAction');
+
         this.items = this.categoriesGetter;
 
         this.loading = false;
       } catch (error) {
         throw error;
+      }
+    },
+
+    async removeCategory() {
+      const isRemove = confirm('Подтвердить удаление?');
+      if (isRemove) {
+        try {
+          let select: any = this.select;
+          const id = this.selectId;
+
+          this.loading = true;
+
+          await this.$store.dispatch('removeCategoryAction', { id });
+          await this.$store.dispatch('fetchCategoriesAction');
+          this.items = this.categoriesGetter;
+
+          // TODO отрефакторить
+
+          select = this.items[0] || null;
+          this.select = select || null;
+          this.title = select.title || '';
+          this.limit = select.limit || '';
+
+          this.loading = false;
+        } catch (error) {
+          throw error;
+        }
       }
     },
   },
@@ -121,9 +152,22 @@ export default Vue.extend({
           :rules="limitRules"
         ></v-text-field>
 
-        <v-btn block color="info" :disabled="!valid" @click="updateCategories">
-          Обновить
-        </v-btn>
+        <v-card-actions>
+          <v-btn
+            block
+            color="info"
+            :disabled="!valid"
+            @click="updateCategories"
+          >
+            Обновить
+          </v-btn>
+        </v-card-actions>
+
+        <v-card-actions>
+          <v-btn block color="info" :disabled="!valid" @click="removeCategory">
+            Удалить
+          </v-btn>
+        </v-card-actions>
       </v-form>
     </div>
   </div>
