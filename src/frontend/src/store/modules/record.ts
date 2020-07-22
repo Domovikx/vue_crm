@@ -19,7 +19,8 @@ const record = {
         const uid: String = await dispatch('getUidAction');
         await firebase.database().ref(`/users/${uid}/records`).push(record);
 
-        dispatch('fetchRecordsAction');
+        await dispatch('fetchRecordsAction');
+        await dispatch('historyByRecordsAction');
       } catch (error) {
         throw error;
       }
