@@ -1,24 +1,16 @@
 const navigationDrawer = {
   state: {
-    navigationDrawer: true,
-  },
-
-  actions: {
-    navigationDrawerAction: (context: any, navigationDrawer: boolean) => {
-      context.commit('navigationDrawerMutation', !navigationDrawer);
-    },
+    drawer: null,
   },
 
   mutations: {
-    navigationDrawerMutation: (state: any, payload: boolean) => {
-      state.navigationDrawer = payload;
+    navigationDrawerMutation: (state: any, drawer: boolean) => {
+      state.drawer = drawer;
     },
   },
 
   getters: {
-    navigationDrawerGetter(state: any) {
-      return state.navigationDrawer;
-    },
+    navigationDrawerGetter: (state: any) => state.drawer,
   },
 };
 

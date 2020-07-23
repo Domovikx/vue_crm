@@ -1,7 +1,7 @@
 <script lang="ts">
 import Vue from 'vue';
 
-import { mapActions, mapGetters } from 'vuex';
+import { mapActions, mapGetters, mapMutations } from 'vuex';
 
 export default Vue.extend({
   name: 'AppBarComponent',
@@ -36,11 +36,8 @@ export default Vue.extend({
   },
 
   methods: {
-    ...mapActions([
-      'navigationDrawerAction',
-      'logoutAction',
-      'fetchInfoAction',
-    ]),
+    ...mapActions(['logoutAction', 'fetchInfoAction']),
+    ...mapMutations(['navigationDrawerMutation']),
 
     async logout() {
       await this.logoutAction();
@@ -48,7 +45,7 @@ export default Vue.extend({
     },
 
     clickBurgerMenu() {
-      this.navigationDrawerAction(this.navigationDrawerGetter);
+      this.navigationDrawerMutation(!this.navigationDrawerGetter);
     },
   },
 });
@@ -76,12 +73,14 @@ export default Vue.extend({
           {{ userName }}
         </v-btn>
       </template>
+
       <v-list class="user-menu-list">
         <v-list-item>
           <v-btn text class="btn btn__menu-item" to="/Profile" tag="button">
             Профиль
           </v-btn>
         </v-list-item>
+
         <v-list-item>
           <v-btn text class="btn btn__menu-item" @click.prevent="logout">
             Выйти

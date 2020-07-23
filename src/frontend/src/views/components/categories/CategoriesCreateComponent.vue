@@ -28,7 +28,7 @@ export default Vue.extend({
     ...mapActions(['createCategoryAction']),
 
     async createCategory() {
-      await this.$store.dispatch('createCategoryAction', {
+      await this.createCategoryAction({
         title: this.title,
         limit: this.limit,
       });

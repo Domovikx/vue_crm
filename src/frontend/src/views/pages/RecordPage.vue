@@ -60,7 +60,11 @@ export default Vue.extend({
   },
 
   methods: {
-    ...mapActions(['fetchCategoriesAction']),
+    ...mapActions([
+      'fetchCategoriesAction',
+      'createRecordAction',
+      'infoUpdateBillAction',
+    ]),
 
     async createRecord() {
       try {
@@ -72,7 +76,7 @@ export default Vue.extend({
           date: new Date().toJSON(),
         };
 
-        await this.$store.dispatch('createRecordAction', record);
+        await this.createRecordAction(record);
 
         let bill = 0;
         const b: number = Number(this.bill);
@@ -84,7 +88,7 @@ export default Vue.extend({
           bill = b + c;
         }
 
-        await this.$store.dispatch('infoUpdateBillAction', { bill });
+        await this.infoUpdateBillAction({ bill });
 
         let f: any = this.$refs.form;
         f.reset();

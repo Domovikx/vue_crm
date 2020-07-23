@@ -59,12 +59,12 @@ export default Vue.extend({
   methods: {
     ...mapActions(['historyByRecordsAction']),
 
-    onEdit() {
-      console.log('onEdit :>> ');
+    onEdit(id: any) {
+      console.log('onEdit :>> ', id);
     },
 
-    onRemove() {
-      console.log('onRemove :>> ');
+    onRemove(id: any) {
+      console.log('onRemove :>> ', id);
     },
   },
 });

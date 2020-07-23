@@ -30,7 +30,7 @@ const category = {
       }
     },
 
-    async fetchCategoriesAction({ getters, commit }: ActionContext) {
+    async fetchCategoriesAction({ getters, commit, dispatch }: ActionContext) {
       try {
         const uid = await getters.uidGetter;
 
@@ -50,7 +50,7 @@ const category = {
           return { id, title, limit };
         });
 
-        commit('categoriesMutation', categoriesFormatting);
+        await commit('categoriesMutation', categoriesFormatting);
       } catch (error) {
         throw error;
       }

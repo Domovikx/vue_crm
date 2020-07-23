@@ -1,7 +1,7 @@
 <script lang="ts">
 import Vue from 'vue';
 
-import { mapGetters } from 'vuex';
+import { mapGetters, mapActions } from 'vuex';
 
 import LoaderComponent from '../../../components/LoaderComponent.vue';
 import { UserCategory } from '../../../interfaces/Category.interface';
@@ -35,27 +35,30 @@ export default Vue.extend({
     ],
   }),
 
+  async created() {
+    if (!this.categoriesGetter) {
+      await this.fetchCategoriesAction();
+    }
+
+    const select: any = this.items[0] || null;
+    if (select) {
+      this.select = select || null;
+      this.title = select.title;
+      this.limit = select.limit;
+      this.selectId = select.id;
+    }
+  },
+
+  mounted() {
+    this.loading = false;
+  },
+
   computed: {
     ...mapGetters(['categoriesGetter']),
 
     items(): any {
       return this.categoriesGetter;
     },
-  },
-
-  created() {
-    this.items = this.categoriesGetter;
-
-    const select: any = this.items[0] || null;
-
-    this.select = select || null;
-    this.title = select.title;
-    this.limit = select.limit;
-    this.selectId = select.id;
-  },
-
-  mounted() {
-    this.loading = false;
   },
 
   watch: {
@@ -70,6 +73,12 @@ export default Vue.extend({
   },
 
   methods: {
+    ...mapActions([
+      'updateCategoriesAction',
+      'removeCategoryAction',
+      'fetchCategoriesAction',
+    ]),
+
     async updateCategories() {
       try {
         const select: any = this.select;
@@ -81,9 +90,7 @@ export default Vue.extend({
 
         this.loading = true;
 
-        await this.$store.dispatch('updateCategoriesAction', categoryData);
-
-        this.items = this.categoriesGetter;
+        await this.updateCategoriesAction(categoryData);
 
         this.loading = false;
       } catch (error) {
@@ -100,9 +107,8 @@ export default Vue.extend({
 
           this.loading = true;
 
-          await this.$store.dispatch('removeCategoryAction', { id });
-          await this.$store.dispatch('fetchCategoriesAction');
-          this.items = this.categoriesGetter;
+          await this.removeCategoryAction({ id });
+          await this.fetchCategoriesAction();
 
           // TODO отрефакторить
 

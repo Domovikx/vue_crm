@@ -53,7 +53,7 @@ const auth = {
 
     async getUidAction({ commit }: any) {
       const user: any = firebase.auth().currentUser || null;
-      const userUid = user.uid || null;
+      const userUid: any = user.uid || null;
 
       localStorage.setItem('uid', userUid);
 

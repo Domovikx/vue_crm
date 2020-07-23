@@ -1,7 +1,7 @@
 <script lang="ts">
 import Vue from 'vue';
 
-import { mapGetters, mapActions } from 'vuex';
+import { mapGetters, mapActions, mapMutations } from 'vuex';
 
 export default Vue.extend({
   name: 'NavigationDrawerComponent',
@@ -15,10 +15,8 @@ export default Vue.extend({
       get() {
         return this.navigationDrawerGetter;
       },
-      set() {
-        // TODO:
-        // Баг на мобильной версии
-        // this.navigationDrawerAction(this.navigationDrawerGetter);
+      set(drawer: boolean) {
+        this.navigationDrawerMutation(drawer);
       },
     },
   },
@@ -34,7 +32,7 @@ export default Vue.extend({
   }),
 
   methods: {
-    ...mapActions(['navigationDrawerAction']),
+    ...mapMutations(['navigationDrawerMutation']),
   },
 });
 </script>
@@ -57,6 +55,4 @@ export default Vue.extend({
   </v-navigation-drawer>
 </template>
 
-<style lang="scss" scoped>
-// @import '../../assets/scss/_fonts.scss';
-</style>
+<style lang="scss" scoped></style>

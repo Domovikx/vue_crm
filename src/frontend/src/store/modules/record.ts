@@ -14,9 +14,14 @@ const record = {
   },
 
   actions: {
-    async createRecordAction({ dispatch }: ActionContext, record: Record) {
+    async createRecordAction(
+      { dispatch, getters }: ActionContext,
+      record: Record,
+    ) {
       try {
-        const uid: String = await dispatch('getUidAction');
+        // const uid: String = await dispatch('getUidAction');
+        const uid: String = await getters.uidGetter;
+
         await firebase.database().ref(`/users/${uid}/records`).push(record);
 
         await dispatch('fetchRecordsAction');
