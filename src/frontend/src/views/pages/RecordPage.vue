@@ -54,8 +54,7 @@ export default Vue.extend({
       await this.fetchCategoriesAction();
     }
 
-    const items: any = this.items;
-    this.selectId = items[0].id;
+    this.selectId = this.items[0].id;
     this.loading = false;
   },
 

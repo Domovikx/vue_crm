@@ -5,7 +5,12 @@ https://vuecrm200711.firebaseio.com/
 import firebase from 'firebase/app';
 
 import ActionContext from '@/interfaces/ActionContext.interface';
-import { Record, Records } from '@/interfaces/Record.interface';
+import {
+  Record,
+  Records,
+  RecordTypeOrder,
+} from '@/interfaces/Record.interface';
+import { HistoryRecord } from '@/interfaces/History.interface';
 
 const record = {
   state: {
@@ -56,6 +61,39 @@ const record = {
         );
 
         commit('recordsMutation', recordsFormatting);
+      } catch (error) {
+        throw error;
+      }
+    },
+
+    async removeRecordAction(
+      { getters, dispatch }: ActionContext,
+      record: HistoryRecord,
+    ) {
+      try {
+        const uid: string = getters.uidGetter;
+        const typeOrder: RecordTypeOrder = record.categoryType;
+        let bill: number = getters.infoBillGetter;
+
+        if (typeOrder === 'outcome') {
+          bill += Number(record.count);
+        }
+
+        if (typeOrder === 'income') {
+          bill -= Number(record.count);
+        }
+
+        // удаляем запись
+        await firebase
+          .database()
+          .ref(`/users/${uid}/records`)
+          .child(record.id)
+          .remove();
+
+        // обновляем счет
+        await dispatch('infoUpdateBillAction', { bill });
+        await dispatch('fetchRecordsAction');
+        await dispatch('historyByRecordsAction');
       } catch (error) {
         throw error;
       }

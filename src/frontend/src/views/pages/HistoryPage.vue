@@ -5,7 +5,10 @@ import { mapGetters, mapActions } from 'vuex';
 
 import LoaderComponent from '../../components/LoaderComponent.vue';
 
-import { HistoryByRecords } from '../../interfaces/History.interface';
+import {
+  HistoryByRecords,
+  HistoryRecord,
+} from '../../interfaces/History.interface';
 
 export default Vue.extend({
   name: 'HistoryPage',
@@ -57,14 +60,18 @@ export default Vue.extend({
   },
 
   methods: {
-    ...mapActions(['historyByRecordsAction']),
+    ...mapActions(['historyByRecordsAction', 'removeRecordAction']),
 
-    onEdit(id: any) {
-      console.log('onEdit :>> ', id);
+    onEdit(item: HistoryRecord) {
+      console.log('onEdit :>> ', item);
     },
 
-    onRemove(id: any) {
-      console.log('onRemove :>> ', id);
+    onRemove(item: HistoryRecord) {
+      console.log('onRemove :>> ', item);
+      const isRemove = confirm('Вы хотите удалить запить?');
+      if (isRemove) {
+        this.removeRecordAction(item);
+      }
     },
   },
 });
@@ -75,7 +82,7 @@ export default Vue.extend({
 
   <v-card v-else-if="!loading">
     <v-card-title>
-      История записей
+      История ({{ bill | currencyFilter(currencyBase) }})
       <v-spacer></v-spacer>
       <v-text-field
         v-model="search"
@@ -116,11 +123,11 @@ export default Vue.extend({
           </td>
 
           <td class="td-flex">
-            <v-btn fab dark small @click="onEdit(row.item.id)">
+            <v-btn fab dark small @click="onEdit(row.item)">
               <v-icon dark>mdi-table-edit</v-icon>
             </v-btn>
 
-            <v-btn fab dark small @click="onRemove(row.item.id)">
+            <v-btn fab dark small @click="onRemove(row.item)">
               <v-icon dark>mdi-delete</v-icon>
             </v-btn>
           </td>
