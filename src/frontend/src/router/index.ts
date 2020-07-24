@@ -46,7 +46,7 @@ const routes: Array<RouteConfig> = [
   },
 
   {
-    path: '/Detail',
+    path: '/Detail/:id',
     name: 'Detail',
     component: () => import('../views/pages/DetailPage.vue'),
     meta: { layout: 'DefaultLayout', requiresAuth: true },

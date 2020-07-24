@@ -14,7 +14,8 @@
 
 ## Ресурсы:
 
-`BD : https://vuecrm200711.firebaseio.com/`
+`BD : https://vuecrm200711.firebaseio.com/`  
+`https://vuetifyjs.com/ru/styles/colors/`
 
 ### курсы валют:
 

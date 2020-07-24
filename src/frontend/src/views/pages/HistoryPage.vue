@@ -63,11 +63,10 @@ export default Vue.extend({
     ...mapActions(['historyByRecordsAction', 'removeRecordAction']),
 
     onEdit(item: HistoryRecord) {
-      console.log('onEdit :>> ', item);
+      this.$router.push({ name: 'Detail', params: { id: item.id } });
     },
 
     onRemove(item: HistoryRecord) {
-      console.log('onRemove :>> ', item);
       const isRemove = confirm('Вы хотите удалить запить?');
       if (isRemove) {
         this.removeRecordAction(item);
@@ -123,11 +122,11 @@ export default Vue.extend({
           </td>
 
           <td class="td-flex">
-            <v-btn fab dark small @click="onEdit(row.item)">
-              <v-icon dark>mdi-table-edit</v-icon>
+            <v-btn fab small @click="onEdit(row.item)">
+              <v-icon>mdi-table-edit</v-icon>
             </v-btn>
 
-            <v-btn fab dark small @click="onRemove(row.item)">
+            <v-btn fab small @click="onRemove(row.item)">
               <v-icon dark>mdi-delete</v-icon>
             </v-btn>
           </td>

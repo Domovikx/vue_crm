@@ -2,6 +2,7 @@ export interface Record {
   id?: string | any;
   categoryId?: string | any;
   categoryType?: string | any;
+  categoryTitle?: string | any;
   count?: number | any;
   description?: string | any;
   date?: string | any;
