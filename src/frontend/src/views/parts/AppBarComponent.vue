@@ -70,6 +70,7 @@ export default Vue.extend({
           v-bind="attrs"
           v-on="on"
         >
+          <v-icon>mdi-account</v-icon>
           {{ userName }}
         </v-btn>
       </template>

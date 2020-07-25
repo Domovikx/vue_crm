@@ -15,12 +15,61 @@ export default Vue.extend({
   data: () => ({
     loading: true,
     id: null || '',
-    // color: ''
+
+    locale: 'ru-RU',
+
+    categorySelect: {},
+    categoryItems: [
+      {
+        type: 'outcome',
+        text: 'Расход',
+        color: 'deep-orange lighten-4',
+      },
+      {
+        type: 'income',
+        text: 'Доход',
+        color: 'teal lighten-4',
+      },
+    ],
+    categoryTypeRules: [(v: string) => !!v || 'Это поле нужно заполнить'],
+
+    categoryType: '',
+    categoryColor: '',
+    categoryText: '',
+
+    date: '',
+    dateModal: false,
+    dateRules: [(v: string) => !!v || 'Это поле нужно заполнить'],
+
+    count: null,
+    countRules: [
+      (v: string) => !!v || 'Это поле нужно заполнить',
+      (v: string) =>
+        /^\d+(?:[\.,]\d+)?$/.test(v) ||
+        'Это поле должно содержать только числа',
+    ],
+
+    description: null,
   }),
 
-  async mounted() {
+  async created() {
     this.id = this.$route.params.id;
     await this.getRecordByIdAction(this.id);
+
+    const categorySelect: CategoryItem | any = this.categoryItems.find(
+      (c: CategoryItem) => this.record.categoryType === c.type,
+    );
+    this.categorySelect = categorySelect;
+    this.date = new Date(this.record.date).toISOString().substr(0, 10);
+    this.count = this.record.count;
+    this.description = this.record.description;
+
+    this.categoryType = categorySelect.type;
+    this.categoryColor = categorySelect.color;
+    this.categoryText = categorySelect.text;
+  },
+
+  async mounted() {
     this.loading = false;
   },
 
@@ -30,46 +79,120 @@ export default Vue.extend({
     record(): Record {
       return this.recordByIdGetter;
     },
-    color(): string {
-      return this.record.categoryType === 'outcome'
-        ? 'deep-orange lighten-4'
-        : 'teal lighten-4';
-    },
-    categoryType(): string {
-      return this.record.categoryType === 'outcome' ? 'Расход' : 'Доход';
+  },
+
+  watch: {
+    categorySelect(type) {
+      const select: CategoryItem | any = this.categoryItems.find(
+        (c: CategoryItem) => c.type === type,
+      );
+      this.categoryType = select.type;
+      this.categoryColor = select.color;
+      this.categoryText = select.text;
     },
   },
 
   methods: {
     ...mapActions(['getRecordByIdAction']),
+
+    onRemove() {
+      console.log('onRemove :>> ');
+    },
+
+    onSave() {
+      console.log('onSave :>> ');
+    },
   },
 });
+
+interface CategoryItem {
+  type: string;
+  color: string;
+  text: string;
+}
 </script>
 
 <template>
   <LoaderComponent v-if="loading" />
 
   <v-card v-else-if="!loading">
-    <v-card-title :class="color">
-      {{ record.categoryTitle }} - {{ categoryType }}
+    <v-card-title :class="categoryColor">
+      {{ record.categoryTitle }} - {{ categoryText }}
     </v-card-title>
 
-    <v-list-item> Сумма: {{ record.count }} </v-list-item>
-    <v-list-item>
-      Дата: {{ record.date | dateFilter('DD-MM-YY time') }}
-    </v-list-item>
-    <v-list-item v-if="record.description">
-      Описание: {{ record.description }}
-    </v-list-item>
+    <v-form ref="form" v-model="valid">
+      <v-container>
+        <v-select
+          label="Тип операции"
+          v-model="categorySelect"
+          :items="categoryItems"
+          :rules="categoryTypeRules"
+          item-text="text"
+          item-value="type"
+          item-color="color"
+          prepend-icon="mdi-format-list-bulleted"
+          required
+        ></v-select>
+
+        <v-dialog
+          ref="dialog"
+          v-model="dateModal"
+          :return-value.sync="date"
+          persistent
+          lazy
+          full-width
+          width="290px"
+        >
+          <template v-slot:activator="{ on }">
+            <v-text-field
+              label="Дата"
+              v-model="date"
+              prepend-icon="mdi-calendar"
+              v-on="on"
+            ></v-text-field>
+          </template>
+
+          <v-date-picker
+            v-model="date"
+            scrollable
+            :locale="locale"
+            first-day-of-week="1"
+          >
+            <v-spacer></v-spacer>
+            <v-btn flat color="primary" @click="dateModal = false">
+              Cancel
+            </v-btn>
+
+            <v-btn flat color="primary" @click="$refs.dialog.save(date)">
+              OK
+            </v-btn>
+          </v-date-picker>
+        </v-dialog>
+
+        <v-text-field
+          label="Счет"
+          v-model="count"
+          :rules="countRules"
+          required
+          prepend-icon="mdi-credit-card-multiple"
+        ></v-text-field>
+
+        <v-text-field
+          label="Описание"
+          v-model="description"
+          prepend-icon="mdi-lead-pencil"
+        ></v-text-field>
+      </v-container>
+    </v-form>
 
     <v-card-actions>
       <v-spacer></v-spacer>
 
-      <v-btn text to="/History">
+      <v-btn text @click="onRemove" to="/History">
         удалить
       </v-btn>
 
-      <v-btn text to="/History">
+      <v-btn text @click="onSave">
         сохранить
       </v-btn>
 
