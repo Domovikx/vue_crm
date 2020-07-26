@@ -23,11 +23,11 @@ export default Vue.extend({
 
   data: (): any => ({
     items: [
-      { title: 'Счет', url: '/', exact: true },
-      { title: 'История', url: '/history' },
-      { title: 'Планирование', url: '/planning' },
-      { title: 'Новая запись', url: '/record' },
-      { title: 'Категории', url: '/categories' },
+      { title: 'Счет', url: '/', exact: true, icon: 'mdi-view-dashboard' },
+      { title: 'История', url: '/history', icon: 'mdi-view-dashboard' },
+      { title: 'Планирование', url: '/planning', icon: 'mdi-view-dashboard' },
+      { title: 'Новая запись', url: '/record', icon: 'mdi-view-dashboard' },
+      { title: 'Категории', url: '/categories', icon: 'mdi-view-dashboard' },
     ],
   }),
 
@@ -47,6 +47,10 @@ export default Vue.extend({
         :exact="item.exact"
         link
       >
+        <v-list-item-icon>
+          <v-icon>{{ item.icon }}</v-icon>
+        </v-list-item-icon>
+
         <v-list-item-content>
           <v-list-item-title>{{ item.title }}</v-list-item-title>
         </v-list-item-content>

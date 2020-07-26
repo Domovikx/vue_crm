@@ -142,6 +142,67 @@ const record = {
         throw error;
       }
     },
+
+    async updateRecordAction(
+      { getters, dispatch }: ActionContext,
+      record: HistoryRecord,
+    ) {
+      try {
+        const uid: string = getters.uidGetter;
+        const currentRecord: HistoryRecord = record;
+        const currentRecordId: string = currentRecord.id;
+        let currentCount: number = currentRecord.count;
+        const previousRecord: HistoryRecord | any =
+          (
+            await firebase
+              .database()
+              .ref(`/users/${uid}/records/`)
+              .child(currentRecordId)
+              .once('value')
+          ).val() || {};
+
+        const previousType: string = previousRecord.categoryType;
+        const currentType: string = currentRecord.categoryType;
+
+        let bill: number = getters.infoBillGetter;
+
+        // Return the account to the starting state
+        if (previousType === 'outcome') {
+          bill += Number(currentCount);
+        } else if (previousType === 'income') {
+          bill -= Number(currentCount);
+        }
+
+        // Updating the current bill
+        if (currentType === 'outcome') {
+          bill -= Number(currentCount);
+        } else if (currentType === 'income') {
+          bill += Number(currentCount);
+        }
+
+        const updatedRecord: Record = {
+          categoryId: currentRecord.categoryId,
+          categoryType: currentRecord.categoryType,
+          count: currentRecord.count,
+          date: currentRecord.date,
+          description: currentRecord.description,
+        };
+
+        // Updating the record
+        await firebase
+          .database()
+          .ref(`/users/${uid}/records`)
+          .child(record.id)
+          .update(record);
+
+        // Updating the bill
+        await dispatch('infoUpdateBillAction', { bill });
+        await dispatch('fetchRecordsAction');
+        await dispatch('historyByRecordsAction');
+      } catch (error) {
+        throw error;
+      }
+    },
   },
 
   mutations: {

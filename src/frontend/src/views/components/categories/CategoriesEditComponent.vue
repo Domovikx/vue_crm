@@ -33,6 +33,8 @@ export default Vue.extend({
         /^\d+(?:[\.,]\d+)?$/.test(v) ||
         'Это поле должно содержать только числа',
     ],
+
+    dialogToRemove: false,
   }),
 
   async created() {
@@ -98,29 +100,30 @@ export default Vue.extend({
       }
     },
 
+    onRemove() {
+      this.dialogToRemove = true;
+    },
+
     async removeCategory() {
-      const isRemove = confirm('Подтвердить удаление?');
-      if (isRemove) {
-        try {
-          let select: any = this.select;
-          const id = this.selectId;
+      try {
+        let select: any = this.select;
+        const id = this.selectId;
 
-          this.loading = true;
+        this.loading = true;
 
-          await this.removeCategoryAction({ id });
-          await this.fetchCategoriesAction();
+        await this.removeCategoryAction({ id });
+        await this.fetchCategoriesAction();
 
-          // TODO отрефакторить
+        // TODO отрефакторить
 
-          select = this.items[0] || null;
-          this.select = select || null;
-          this.title = select.title || '';
-          this.limit = select.limit || '';
+        select = this.items[0] || null;
+        this.select = select || null;
+        this.title = select.title || '';
+        this.limit = select.limit || '';
 
-          this.loading = false;
-        } catch (error) {
-          throw error;
-        }
+        this.loading = false;
+      } catch (error) {
+        throw error;
       }
     },
   },
@@ -131,51 +134,73 @@ export default Vue.extend({
   <LoaderComponent v-if="loading" />
 
   <div class="col s12 m6" v-else-if="!loading">
-    <div>
-      <h3>Редактировать</h3>
+    <h3>Редактировать</h3>
 
-      <v-form ref="form" v-model="valid">
-        <v-select
-          v-model="select"
-          :items="items"
-          item-text="title"
-          item-value="id"
-          label="Выберите категорию"
-          required
-        ></v-select>
+    <v-form ref="form" v-model="valid">
+      <v-select
+        v-model="select"
+        :items="items"
+        item-text="title"
+        item-value="id"
+        label="Выберите категорию"
+        required
+      ></v-select>
 
-        <v-text-field
-          v-model="title"
-          label="Название"
-          required
-          :rules="titleRules"
-        ></v-text-field>
+      <v-text-field
+        v-model="title"
+        label="Название"
+        required
+        :rules="titleRules"
+      ></v-text-field>
 
-        <v-text-field
-          v-model="limit"
-          label="Лимит"
-          required
-          :rules="limitRules"
-        ></v-text-field>
+      <v-text-field
+        v-model="limit"
+        label="Лимит"
+        required
+        :rules="limitRules"
+      ></v-text-field>
+
+      <v-card-actions>
+        <v-btn block color="info" :disabled="!valid" @click="updateCategories">
+          Обновить
+        </v-btn>
+      </v-card-actions>
+
+      <v-card-actions>
+        <v-btn block color="info" :disabled="!valid" @click="onRemove">
+          Удалить
+        </v-btn>
+      </v-card-actions>
+    </v-form>
+
+    <!-- dialogToRemove -->
+    <v-dialog v-model="dialogToRemove" max-width="290">
+      <v-card>
+        <v-card-title class="headline">
+          Удалить запись?
+        </v-card-title>
+
+        <v-card-text>
+          Внимание. Удаление записи необратимо. Подтвердите удаление записи.
+        </v-card-text>
 
         <v-card-actions>
-          <v-btn
-            block
-            color="info"
-            :disabled="!valid"
-            @click="updateCategories"
-          >
-            Обновить
+          <v-spacer></v-spacer>
+
+          <v-btn color="green darken-1" text @click="dialogToRemove = false">
+            Отмена
           </v-btn>
-        </v-card-actions>
 
-        <v-card-actions>
-          <v-btn block color="info" :disabled="!valid" @click="removeCategory">
+          <v-btn
+            color="green darken-1"
+            text
+            @click="(dialogToRemove = false), removeCategory()"
+          >
             Удалить
           </v-btn>
         </v-card-actions>
-      </v-form>
-    </div>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 

@@ -27,7 +27,7 @@ export default Vue.extend({
       { text: 'Тип', value: 'categoryType' },
       { text: 'Сумма', value: 'count' },
       { text: 'Описание', value: 'description' },
-      { text: 'Действия', value: 'id', sortable: false, align: 'center' },
+      { text: 'Действие', value: 'id', sortable: false, align: 'center' },
     ],
 
     record: null,
@@ -58,7 +58,6 @@ export default Vue.extend({
     if (!this.historyByRecordsGetter) {
       await this.historyByRecordsAction();
     }
-
     this.loading = false;
   },
 
@@ -77,6 +76,14 @@ export default Vue.extend({
     async removeRecord() {
       await this.removeRecordAction(this.record);
       this.$router.push('/History');
+    },
+
+    customRowClass(item: HistoryRecord) {
+      const color =
+        item.categoryType === 'outcome'
+          ? 'deep-orange lighten-4'
+          : 'teal lighten-4';
+      return `cursor ${color}`;
     },
   },
 });
@@ -107,8 +114,8 @@ export default Vue.extend({
       multi-sort
     >
       <template v-slot:item="row">
-        <tr>
-          <td>{{ row.item.date | dateFilter('DD-MM-YY time') }}</td>
+        <tr :class="customRowClass(row.item)" @click="onEdit(row.item)">
+          <td>{{ row.item.date | dateFilter('DD-MM-YY') }}</td>
 
           <td>
             {{
@@ -128,11 +135,7 @@ export default Vue.extend({
           </td>
 
           <td class="td-flex">
-            <v-btn fab small @click="onEdit(row.item)">
-              <v-icon>mdi-table-edit</v-icon>
-            </v-btn>
-
-            <v-btn fab small @click="onRemove(row.item)">
+            <v-btn icon @click.stop="onRemove(row.item)">
               <v-icon dark>mdi-delete</v-icon>
             </v-btn>
           </td>
@@ -183,5 +186,9 @@ export default Vue.extend({
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.cursor {
+  cursor: pointer;
 }
 </style>

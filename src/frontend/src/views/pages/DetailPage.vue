@@ -95,7 +95,11 @@ export default Vue.extend({
   },
 
   methods: {
-    ...mapActions(['getRecordByIdAction', 'removeRecordAction']),
+    ...mapActions([
+      'getRecordByIdAction',
+      'removeRecordAction',
+      'updateRecordAction',
+    ]),
 
     onRemove() {
       this.dialogToRemove = true;
@@ -106,8 +110,17 @@ export default Vue.extend({
       this.$router.push('/History');
     },
 
-    onSave() {
-      console.log('onSave :>> ');
+    async onSave() {
+      const record: Record = {
+        ...this.record,
+        categoryType: this.categoryType,
+        date: this.date,
+        count: this.count,
+        description: this.description,
+      };
+
+      await this.updateRecordAction(record);
+      this.$router.push('/History');
     },
   },
 });
@@ -125,6 +138,12 @@ interface CategoryItem {
   <v-card v-else-if="!loading">
     <v-card-title :class="categoryColor">
       {{ record.categoryTitle }} - {{ categoryText }}
+      <v-spacer></v-spacer>
+      <v-btn icon to="/History">
+        <v-icon dark>
+          mdi-close-circle
+        </v-icon>
+      </v-btn>
     </v-card-title>
 
     <v-form ref="form" v-model="valid">
@@ -166,11 +185,11 @@ interface CategoryItem {
             first-day-of-week="1"
           >
             <v-spacer></v-spacer>
-            <v-btn flat color="primary" @click="dateModal = false">
+            <v-btn text color="primary" @click="dateModal = false">
               Cancel
             </v-btn>
 
-            <v-btn flat color="primary" @click="$refs.dialog.save(date)">
+            <v-btn text color="primary" @click="$refs.dialog.save(date)">
               OK
             </v-btn>
           </v-date-picker>
