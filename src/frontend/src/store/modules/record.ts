@@ -180,20 +180,12 @@ const record = {
           bill += Number(currentCount);
         }
 
-        const updatedRecord: Record = {
-          categoryId: currentRecord.categoryId,
-          categoryType: currentRecord.categoryType,
-          count: currentRecord.count,
-          date: currentRecord.date,
-          description: currentRecord.description,
-        };
-
         // Updating the record
         await firebase
           .database()
           .ref(`/users/${uid}/records`)
           .child(record.id)
-          .update(record);
+          .update(currentRecord);
 
         // Updating the bill
         await dispatch('infoUpdateBillAction', { bill });

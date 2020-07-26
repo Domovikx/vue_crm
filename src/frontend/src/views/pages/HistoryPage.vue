@@ -24,6 +24,7 @@ export default Vue.extend({
 
     headers: [
       { text: 'Дата', value: 'date', align: 'center', sortable: true },
+      { text: 'Категория', value: 'category', sortable: true },
       { text: 'Тип', value: 'categoryType' },
       { text: 'Сумма', value: 'count' },
       { text: 'Описание', value: 'description' },
@@ -116,6 +117,10 @@ export default Vue.extend({
       <template v-slot:item="row">
         <tr :class="customRowClass(row.item)" @click="onEdit(row.item)">
           <td>{{ row.item.date | dateFilter('DD-MM-YY') }}</td>
+
+          <td>
+            {{ row.item.categoryTitle }}
+          </td>
 
           <td>
             {{

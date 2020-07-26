@@ -2,8 +2,10 @@
 import Vue from 'vue';
 
 import { mapGetters, mapActions, mapMutations } from 'vuex';
-import { Record } from '../../interfaces/Record.interface';
 import LoaderComponent from '../../components/LoaderComponent.vue';
+
+import { Record } from '../../interfaces/Record.interface';
+import { Categories, UserCategory } from '../../interfaces/Category.interface';
 
 export default Vue.extend({
   name: 'DetailPage',
@@ -14,6 +16,7 @@ export default Vue.extend({
 
   data: () => ({
     loading: true,
+    valid: false,
     id: null || '',
 
     locale: 'ru-RU',
@@ -33,7 +36,10 @@ export default Vue.extend({
     ],
     categoryTypeRules: [(v: string) => !!v || 'Это поле нужно заполнить'],
 
+    categoryTitle: '',
+    categoryId: '',
     categoryType: '',
+    categoryTypeSelect: {} || '',
     categoryColor: '',
     categoryText: '',
 
@@ -66,9 +72,16 @@ export default Vue.extend({
     this.count = this.record.count;
     this.description = this.record.description;
 
+    this.categoryTitle = this.record.categoryTitle;
+    this.categoryId = this.record.categoryId;
     this.categoryType = categorySelect.type;
     this.categoryColor = categorySelect.color;
     this.categoryText = categorySelect.text;
+
+    this.categoryTypeSelect =
+      this.categoriesAll.find(
+        (c: UserCategory) => c.id === this.record.categoryId,
+      ) || '';
   },
 
   async mounted() {
@@ -76,10 +89,14 @@ export default Vue.extend({
   },
 
   computed: {
-    ...mapGetters(['recordByIdGetter']),
+    ...mapGetters(['recordByIdGetter', 'categoriesGetter']),
 
     record(): Record {
       return this.recordByIdGetter;
+    },
+
+    categoriesAll(): Categories {
+      return this.categoriesGetter;
     },
   },
 
@@ -91,6 +108,15 @@ export default Vue.extend({
       this.categoryType = select.type;
       this.categoryColor = select.color;
       this.categoryText = select.text;
+    },
+
+    categoryTypeSelect(id) {
+      const categoriesAll: Categories = this.categoriesAll;
+      const select: UserCategory | any = categoriesAll.find(
+        (c: UserCategory) => c.id === id,
+      );
+      this.categoryTitle = select.title;
+      this.categoryId = select.id;
     },
   },
 
@@ -113,6 +139,8 @@ export default Vue.extend({
     async onSave() {
       const record: Record = {
         ...this.record,
+        categoryId: this.categoryId,
+        categoryTitle: this.categoryTitle,
         categoryType: this.categoryType,
         date: this.date,
         count: this.count,
@@ -137,7 +165,7 @@ interface CategoryItem {
 
   <v-card v-else-if="!loading">
     <v-card-title :class="categoryColor">
-      {{ record.categoryTitle }} - {{ categoryText }}
+      {{ categoryTitle }} - {{ categoryText }}
       <v-spacer></v-spacer>
       <v-btn icon to="/History">
         <v-icon dark>
@@ -148,6 +176,16 @@ interface CategoryItem {
 
     <v-form ref="form" v-model="valid">
       <v-container>
+        <v-select
+          label="Категория"
+          v-model="categoryTypeSelect"
+          :items="categoriesAll"
+          item-text="title"
+          item-value="id"
+          prepend-icon="mdi-format-list-bulleted"
+          required
+        ></v-select>
+
         <v-select
           label="Тип операции"
           v-model="categorySelect"
@@ -165,8 +203,6 @@ interface CategoryItem {
           v-model="dateModal"
           :return-value.sync="date"
           persistent
-          lazy
-          full-width
           width="290px"
         >
           <template v-slot:activator="{ on }">
@@ -218,7 +254,7 @@ interface CategoryItem {
         удалить
       </v-btn>
 
-      <v-btn text @click="onSave">
+      <v-btn text @click="onSave" :disabled="!valid">
         сохранить
       </v-btn>
 
