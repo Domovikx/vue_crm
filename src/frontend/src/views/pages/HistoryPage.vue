@@ -29,6 +29,9 @@ export default Vue.extend({
       { text: 'Описание', value: 'description' },
       { text: 'Действия', value: 'id', sortable: false, align: 'center' },
     ],
+
+    record: null,
+    dialogToRemove: false,
   }),
 
   computed: {
@@ -66,11 +69,14 @@ export default Vue.extend({
       this.$router.push({ name: 'Detail', params: { id: item.id } });
     },
 
-    onRemove(item: HistoryRecord) {
-      const isRemove = confirm('Вы хотите удалить запить?');
-      if (isRemove) {
-        this.removeRecordAction(item);
-      }
+    onRemove(item: HistoryRecord | any) {
+      this.record = item;
+      this.dialogToRemove = true;
+    },
+
+    async removeRecord() {
+      await this.removeRecordAction(this.record);
+      this.$router.push('/History');
     },
   },
 });
@@ -133,6 +139,35 @@ export default Vue.extend({
         </tr>
       </template>
     </v-data-table>
+
+    <!-- dialogToRemove -->
+    <v-dialog v-model="dialogToRemove" max-width="290">
+      <v-card>
+        <v-card-title class="headline">
+          Удалить запись?
+        </v-card-title>
+
+        <v-card-text>
+          Внимание. Удаление записи необратимо. Подтвердите удаление записи.
+        </v-card-text>
+
+        <v-card-actions>
+          <v-spacer></v-spacer>
+
+          <v-btn color="green darken-1" text @click="dialogToRemove = false">
+            Отмена
+          </v-btn>
+
+          <v-btn
+            color="green darken-1"
+            text
+            @click="(dialogToRemove = false), removeRecord()"
+          >
+            Удалить
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-card>
 </template>
 

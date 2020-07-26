@@ -50,6 +50,8 @@ export default Vue.extend({
     ],
 
     description: null,
+
+    dialogToRemove: false,
   }),
 
   async created() {
@@ -93,10 +95,15 @@ export default Vue.extend({
   },
 
   methods: {
-    ...mapActions(['getRecordByIdAction']),
+    ...mapActions(['getRecordByIdAction', 'removeRecordAction']),
 
     onRemove() {
-      console.log('onRemove :>> ');
+      this.dialogToRemove = true;
+    },
+
+    async removeRecord() {
+      await this.removeRecordAction(this.record);
+      this.$router.push('/History');
     },
 
     onSave() {
@@ -188,7 +195,7 @@ interface CategoryItem {
     <v-card-actions>
       <v-spacer></v-spacer>
 
-      <v-btn text @click="onRemove" to="/History">
+      <v-btn text @click="onRemove">
         удалить
       </v-btn>
 
@@ -200,5 +207,34 @@ interface CategoryItem {
         История
       </v-btn>
     </v-card-actions>
+
+    <!-- dialogToRemove -->
+    <v-dialog v-model="dialogToRemove" max-width="290">
+      <v-card>
+        <v-card-title class="headline">
+          Удалить запись?
+        </v-card-title>
+
+        <v-card-text>
+          Внимание. Удаление записи необратимо. Подтвердите удаление записи.
+        </v-card-text>
+
+        <v-card-actions>
+          <v-spacer></v-spacer>
+
+          <v-btn color="green darken-1" text @click="dialogToRemove = false">
+            Отмена
+          </v-btn>
+
+          <v-btn
+            color="green darken-1"
+            text
+            @click="(dialogToRemove = false), removeRecord()"
+          >
+            Удалить
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-card>
 </template>
