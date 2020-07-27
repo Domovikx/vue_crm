@@ -9,6 +9,9 @@ import { Categories, UserCategory } from '../../interfaces/Category.interface';
 
 export default Vue.extend({
   name: 'DetailPage',
+  metaInfo: {
+    title: 'Редактирование записи',
+  },
 
   components: {
     LoaderComponent,

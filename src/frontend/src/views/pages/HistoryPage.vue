@@ -12,6 +12,9 @@ import {
 
 export default Vue.extend({
   name: 'HistoryPage',
+  metaInfo: {
+    title: 'История',
+  },
 
   components: {
     LoaderComponent,

@@ -9,6 +9,9 @@ import { PlanningsByCategories } from '../../interfaces/PlanningByCategory.inter
 
 export default Vue.extend({
   name: 'PlanningPage',
+  metaInfo: {
+    title: 'Планирование',
+  },
 
   components: {
     LoaderComponent,

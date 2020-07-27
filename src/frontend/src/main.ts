@@ -3,6 +3,7 @@ import App from './App.vue';
 import router from './router';
 import store from './store';
 import vuetify from './plugins/vuetify.plugin';
+import VueMeta from 'vue-meta';
 
 import dateFilter from './filters/dateFilter';
 import currencyFilter from './filters/currencyFilter';
@@ -23,6 +24,8 @@ Vue.config.productionTip = false;
 Vue.filter('dateFilter', dateFilter);
 Vue.filter('currencyFilter', currencyFilter);
 Vue.filter('categoryTypeFilter', categoryTypeFilter);
+
+Vue.use(VueMeta);
 
 let app: any;
 

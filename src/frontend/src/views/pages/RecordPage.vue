@@ -8,6 +8,9 @@ import { Record } from '../../interfaces/Record.interface';
 
 export default Vue.extend({
   name: 'RecordPage',
+  metaInfo: {
+    title: 'Добавление записи',
+  },
 
   components: {
     LoaderComponent,

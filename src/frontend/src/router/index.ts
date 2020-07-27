@@ -1,10 +1,12 @@
 import Vue from 'vue';
 import VueRouter, { RouteConfig } from 'vue-router';
+import Meta from 'vue-meta';
 import firebase from 'firebase/app';
 
 import HomePage from '../views/pages/HomePage.vue';
 
 Vue.use(VueRouter);
+Vue.use(Meta);
 
 const routes: Array<RouteConfig> = [
   // EmptyLayout

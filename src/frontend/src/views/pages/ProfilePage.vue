@@ -8,6 +8,9 @@ import { Info } from '../../interfaces/Info.interface';
 
 export default Vue.extend({
   name: 'ProfilePage',
+  metaInfo: {
+    title: 'Профиль',
+  },
 
   components: {
     LoaderComponent,

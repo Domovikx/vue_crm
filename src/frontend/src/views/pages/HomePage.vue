@@ -9,6 +9,9 @@ import LoaderComponent from '../../components/LoaderComponent.vue';
 
 export default Vue.extend({
   name: 'HomePage',
+  metaInfo: {
+    title: 'Счет',
+  },
 
   components: {
     HomeBillComponent,
