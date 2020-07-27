@@ -62,7 +62,7 @@ export default Vue.extend({
     ...mapActions([
       'fetchCategoriesAction',
       'createRecordAction',
-      'infoUpdateBillAction',
+      'infoUpdateAction',
     ]),
 
     async createRecord() {
@@ -87,7 +87,7 @@ export default Vue.extend({
           bill = b + c;
         }
 
-        await this.infoUpdateBillAction({ bill });
+        await this.infoUpdateAction({ bill });
 
         let f: any = this.$refs.form;
         f.reset();

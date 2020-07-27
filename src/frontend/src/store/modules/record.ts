@@ -135,7 +135,7 @@ const record = {
           .remove();
 
         // обновляем счет
-        await dispatch('infoUpdateBillAction', { bill });
+        await dispatch('infoUpdateAction', { bill });
         await dispatch('fetchRecordsAction');
         await dispatch('historyByRecordsAction');
       } catch (error) {

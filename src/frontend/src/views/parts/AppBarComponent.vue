@@ -71,7 +71,7 @@ export default Vue.extend({
           v-on="on"
         >
           <v-icon>mdi-account</v-icon>
-          {{ userName }}
+          <span class="truncate">{{ userName }}</span>
         </v-btn>
       </template>
 
@@ -96,5 +96,15 @@ export default Vue.extend({
 }
 .v-menu__content {
   margin-top: 20px;
+}
+.truncate {
+  min-width: 100px;
+  max-width: 1px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  @media (max-width: 600px) {
+    min-width: auto;
+  }
 }
 </style>
