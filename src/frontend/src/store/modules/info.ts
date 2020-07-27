@@ -13,23 +13,21 @@ const info = {
   },
 
   actions: {
-    async fetchInfoAction({ commit, getters }: ActionContext) {
+    async fetchInfoAction({ commit, getters, dispatch }: ActionContext) {
       try {
         let uid = await getters.uidGetter;
 
         if (!uid) {
-          const localUid = localStorage.getItem('uid');
-          if (localUid) {
-            uid = localUid;
-            commit('setUidMutation', uid);
-          }
+          uid = await dispatch('getUidAction');
+          await commit('setUidMutation', uid);
+          await dispatch('fetchCategoriesAction');
         }
 
         if (uid) {
           const info = (
             await firebase.database().ref(`/users/${uid}/info`).once('value')
           ).val();
-          commit('setInfoMutation', info);
+          await commit('setInfoMutation', info);
         }
       } catch (error) {
         throw error;
@@ -46,8 +44,6 @@ const info = {
 
         if (name) info.name = name;
         if (bill) info.bill = bill;
-
-        console.log('info :>> ', info);
 
         await firebase.database().ref(`/users/${uid}/info`).update(info);
 

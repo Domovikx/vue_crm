@@ -17,7 +17,6 @@ export default Vue.extend({
     loading: true,
     valid: false,
 
-    // items: [],
     select: {},
     selectId: null,
 

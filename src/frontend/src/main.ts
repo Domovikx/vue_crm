@@ -50,3 +50,5 @@ firebase.auth().onAuthStateChanged(() => {
     }).$mount('#app');
   }
 });
+
+export { app };

@@ -88,6 +88,9 @@ export default Vue.extend({
   },
 
   async mounted() {
+    if (await !this.$store.getters.uidGetter) {
+      await this.$store.dispatch('fetchInfoAction');
+    }
     this.loading = false;
   },
 
@@ -254,14 +257,17 @@ interface CategoryItem {
       <v-spacer></v-spacer>
 
       <v-btn text @click="onRemove">
+        <v-icon left>mdi-table-row-remove</v-icon>
         удалить
       </v-btn>
 
       <v-btn text @click="onSave" :disabled="!valid">
+        <v-icon left>mdi-refresh</v-icon>
         сохранить
       </v-btn>
 
       <v-btn text to="/History">
+        <v-icon left>mdi-chart-line</v-icon>
         История
       </v-btn>
     </v-card-actions>

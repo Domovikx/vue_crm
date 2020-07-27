@@ -59,6 +59,9 @@ export default Vue.extend({
   },
 
   async mounted() {
+    if (await !this.$store.getters.uidGetter) {
+      await this.$store.dispatch('fetchInfoAction');
+    }
     if (!this.historyByRecordsGetter) {
       await this.historyByRecordsAction();
     }

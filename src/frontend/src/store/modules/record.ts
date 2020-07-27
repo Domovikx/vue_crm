@@ -40,8 +40,6 @@ const record = {
     async fetchRecordsAction({ getters, commit }: ActionContext) {
       try {
         const uid: string = getters.uidGetter;
-        const categories: [UserCategory] = getters.categoriesGetter;
-
         const records: Records =
           (
             await firebase.database().ref(`/users/${uid}/records`).once('value')
@@ -50,19 +48,9 @@ const record = {
         const recordsKeys = Object.keys(records);
         const recordsFormatting = recordsKeys.map(
           (key: any): Record => {
-            const category: UserCategory | any = categories.find(
-              (c: UserCategory) => c.id === records[key].categoryId,
-            );
-            const categoryTitle: string = category.title;
-
             const record: Record = {
               id: key,
-              categoryId: records[key].categoryId,
-              categoryType: records[key].categoryType,
-              categoryTitle,
-              count: records[key].count,
-              date: records[key].date,
-              description: records[key].description,
+              ...records[key],
             };
             return record;
           },

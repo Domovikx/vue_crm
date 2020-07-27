@@ -3,6 +3,7 @@ https://vuecrm200711.firebaseio.com/
 */
 
 import firebase from 'firebase/app';
+import { app } from '@/main';
 
 import ActionContext from '@/interfaces/ActionContext.interface';
 import RegistrationData from '@/interfaces/RegistrationData.interface';
@@ -29,7 +30,9 @@ const auth = {
 
     async logoutAction({ commit }: ActionContext) {
       await firebase.auth().signOut();
-      commit('clearInfoMutation');
+      // commit('clearInfoMutation');
+      // Рабочий костыль для сброса стора
+      app.$router.go();
     },
 
     async registerAction(
@@ -54,10 +57,8 @@ const auth = {
     async getUidAction({ commit }: any) {
       const user: any = firebase.auth().currentUser || null;
       const userUid: any = user.uid || null;
-
-      localStorage.setItem('uid', userUid);
-
       await commit('setUidMutation', userUid);
+      return userUid;
     },
   },
 

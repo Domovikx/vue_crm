@@ -5,6 +5,7 @@ import { mapGetters, mapActions } from 'vuex';
 
 import LoaderComponent from '../../components/LoaderComponent.vue';
 import { Record } from '../../interfaces/Record.interface';
+import { Categories, UserCategory } from '../../interfaces/Category.interface';
 
 export default Vue.extend({
   name: 'RecordPage',
@@ -22,6 +23,7 @@ export default Vue.extend({
 
     selectId: null,
 
+    categoryTitle: 'categoryTitle',
     categoryType: 'outcome',
     categoryTypeRules: [(v: string) => !!v || 'Это поле нужно заполнить'],
 
@@ -47,12 +49,15 @@ export default Vue.extend({
       return this.currencyBaseGetter;
     },
 
-    items: function (): any {
+    items: function (): Categories {
       return this.categoriesGetter;
     },
   },
 
   async mounted() {
+    if (await !this.$store.getters.uidGetter) {
+      await this.$store.dispatch('fetchInfoAction');
+    }
     if (!this.categoriesGetter) {
       await this.fetchCategoriesAction();
     }
@@ -70,8 +75,16 @@ export default Vue.extend({
 
     async createRecord() {
       try {
+        console.log('this.selectId :>> ', this.selectId);
+        const category: UserCategory | any = this.items.find(
+          (i: UserCategory) => i.id === this.selectId,
+        );
+        console.log('category.title :>> ', category.title);
+        this.categoryTitle = category.title;
+        console.log('this.categoryTitle  :>> ', this.categoryTitle);
         const record: Record = {
           categoryId: this.selectId,
+          categoryTitle: this.categoryTitle,
           count: this.count,
           description: this.description || '',
           categoryType: this.categoryType,

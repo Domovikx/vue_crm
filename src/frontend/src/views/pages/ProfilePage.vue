@@ -45,7 +45,10 @@ export default Vue.extend({
 
   created() {},
 
-  mounted() {
+  async mounted() {
+    if (await !this.$store.getters.uidGetter) {
+      await this.$store.dispatch('fetchInfoAction');
+    }
     this.loading = false;
 
     this.name = this.infoUserNameGetter;

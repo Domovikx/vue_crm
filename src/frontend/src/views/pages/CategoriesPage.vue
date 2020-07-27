@@ -21,11 +21,31 @@ export default Vue.extend({
 
   data: () => ({
     loading: true,
+
+    showEditComponent: false,
   }),
 
   async mounted() {
+    if (await !this.$store.getters.uidGetter) {
+      await this.$store.dispatch('fetchInfoAction');
+    }
     await this.$store.dispatch('fetchCategoriesAction');
     this.loading = false;
+  },
+
+  computed: {
+    ...mapGetters(['categoriesGetter']),
+
+    categories(): any {
+      return this.categoriesGetter;
+    },
+  },
+
+  watch: {
+    categories() {
+      const categories: any[] = this.categories;
+      this.showEditComponent = categories.length > 0 ? true : false;
+    },
   },
 });
 </script>
@@ -40,7 +60,7 @@ export default Vue.extend({
 
     <div class="row">
       <CategoriesCreateComponent />
-      <CategoriesEditComponent />
+      <CategoriesEditComponent v-if="showEditComponent" />
     </div>
   </div>
 </template>

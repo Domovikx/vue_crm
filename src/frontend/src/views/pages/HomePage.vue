@@ -40,6 +40,9 @@ export default Vue.extend({
   },
 
   async mounted() {
+    if (await !this.$store.getters.uidGetter) {
+      await this.$store.dispatch('fetchInfoAction');
+    }
     await this.currencyFetchAction();
     this.loading = false;
   },
