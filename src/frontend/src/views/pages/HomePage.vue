@@ -58,7 +58,8 @@ export default Vue.extend({
     <v-card-title>
       Счет ({{ bill | currencyFilter(currencyBase) }})
       <v-spacer></v-spacer>
-      <v-btn color="secondary" @click="refresh">
+      <v-btn text @click="refresh">
+        <v-icon left>mdi-refresh</v-icon>
         обновить
       </v-btn>
     </v-card-title>

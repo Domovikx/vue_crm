@@ -23,11 +23,24 @@ export default Vue.extend({
 
   data: (): any => ({
     items: [
-      { title: 'Счет', url: '/', exact: true, icon: 'mdi-view-dashboard' },
-      { title: 'История', url: '/history', icon: 'mdi-view-dashboard' },
-      { title: 'Планирование', url: '/planning', icon: 'mdi-view-dashboard' },
-      { title: 'Новая запись', url: '/record', icon: 'mdi-view-dashboard' },
-      { title: 'Категории', url: '/categories', icon: 'mdi-view-dashboard' },
+      {
+        title: 'Счет',
+        url: '/',
+        exact: true,
+        icon: 'mdi-credit-card-multiple',
+      },
+      { title: 'История', url: '/history', icon: 'mdi-table' },
+      {
+        title: 'Планирование',
+        url: '/planning',
+        icon: 'mdi-chart-line',
+      },
+      {
+        title: 'Новая запись',
+        url: '/record',
+        icon: 'mdi-table-column-plus-before',
+      },
+      { title: 'Категории', url: '/categories', icon: 'mdi-table-edit' },
     ],
   }),
 

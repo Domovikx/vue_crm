@@ -160,14 +160,13 @@ export default Vue.extend({
         :rules="limitRules"
       ></v-text-field>
 
-      <v-card-actions>
-        <v-btn block color="info" :disabled="!valid" @click="updateCategories">
+      <v-card-actions class="justify-center">
+        <v-btn text :disabled="!valid" @click="updateCategories">
+          <v-icon left>mdi-refresh</v-icon>
           Обновить
         </v-btn>
-      </v-card-actions>
-
-      <v-card-actions>
-        <v-btn block color="info" :disabled="!valid" @click="onRemove">
+        <v-btn text :disabled="!valid" @click="onRemove">
+          <v-icon left>mdi-table-row-remove</v-icon>
           Удалить
         </v-btn>
       </v-card-actions>

@@ -75,17 +75,15 @@ export default Vue.extend({
         </v-btn>
       </template>
 
-      <v-list class="user-menu-list">
-        <v-list-item>
-          <v-btn text class="btn btn__menu-item" to="/Profile" tag="button">
-            Профиль
-          </v-btn>
+      <v-list nav class="user-menu-list">
+        <v-list-item to="/Profile">
+          <v-icon left>mdi-account-edit</v-icon>
+          <v-list-item-title>Профиль</v-list-item-title>
         </v-list-item>
 
-        <v-list-item>
-          <v-btn text class="btn btn__menu-item" @click.prevent="logout">
-            Выйти
-          </v-btn>
+        <v-list-item @click.prevent="logout">
+          <v-icon left>mdi-logout</v-icon>
+          <v-list-item-title>Выйти</v-list-item-title>
         </v-list-item>
       </v-list>
     </v-menu>

@@ -82,8 +82,8 @@ export default Vue.extend({
     customRowClass(item: HistoryRecord) {
       const color =
         item.categoryType === 'outcome'
-          ? 'deep-orange lighten-4'
-          : 'teal lighten-4';
+          ? 'deep-orange lighten-5'
+          : 'teal lighten-5';
       return `cursor ${color}`;
     },
   },
@@ -128,7 +128,7 @@ export default Vue.extend({
             }}
           </td>
 
-          <td>{{ row.item.count }}</td>
+          <td>{{ row.item.count | currencyFilter('BYN', 3) }}</td>
 
           <td class="truncate">
             <v-tooltip bottom>

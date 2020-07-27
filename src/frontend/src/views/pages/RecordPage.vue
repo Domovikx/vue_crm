@@ -139,12 +139,8 @@ export default Vue.extend({
       <v-text-field v-model.trim="description" label="Описание"></v-text-field>
 
       <v-card-actions>
-        <v-btn
-          block
-          color="info"
-          @click.prevent="createRecord"
-          :disabled="!valid"
-        >
+        <v-btn block text @click.prevent="createRecord" :disabled="!valid">
+          <v-icon left>mdi-table-row-plus-before</v-icon>
           Создать
         </v-btn>
       </v-card-actions>
