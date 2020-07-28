@@ -83,7 +83,6 @@ export default Vue.extend({
 
     <v-form ref="form" v-model="valid">
       <v-text-field
-        v-if="name"
         v-model.trim="name"
         label="Име пользователя"
         counter
@@ -92,7 +91,6 @@ export default Vue.extend({
       ></v-text-field>
 
       <v-text-field
-        v-if="bill"
         v-model.number="bill"
         label="Счет"
         required

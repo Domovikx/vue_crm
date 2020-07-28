@@ -19,6 +19,7 @@ export default Vue.extend({
 
   data: () => ({
     loading: true,
+    categoriesExist: false,
     valid: false,
 
     selectId: null,
@@ -55,15 +56,22 @@ export default Vue.extend({
   },
 
   async mounted() {
-    if (await !this.$store.getters.uidGetter) {
+    if (!this.$store.getters.uidGetter) {
       await this.$store.dispatch('fetchInfoAction');
     }
+
     if (!this.categoriesGetter) {
       await this.fetchCategoriesAction();
     }
 
-    this.selectId = this.items[0].id;
-    this.loading = false;
+    if (this.categoriesGetter[0]) {
+      this.categoriesExist = true;
+      this.selectId = this.items[0].id;
+      this.loading = false;
+    } else if (!this.categoriesGetter[0]) {
+      this.categoriesExist = false;
+      this.loading = false;
+    }
   },
 
   methods: {
@@ -75,13 +83,12 @@ export default Vue.extend({
 
     async createRecord() {
       try {
-        console.log('this.selectId :>> ', this.selectId);
         const category: UserCategory | any = this.items.find(
           (i: UserCategory) => i.id === this.selectId,
         );
-        console.log('category.title :>> ', category.title);
+
         this.categoryTitle = category.title;
-        console.log('this.categoryTitle  :>> ', this.categoryTitle);
+
         const record: Record = {
           categoryId: this.selectId,
           categoryTitle: this.categoryTitle,
@@ -118,7 +125,19 @@ export default Vue.extend({
 <template>
   <LoaderComponent v-if="loading" />
 
-  <div v-else-if="!loading">
+  <div v-else-if="!categoriesExist && !loading">
+    <v-card-title>
+      Категории отсутствуют
+      <v-spacer></v-spacer>
+      {{ bill | currencyFilter(currencyBase) }}
+    </v-card-title>
+    <v-btn text block to="/categories">
+      <v-icon left>mdi-table-row-plus-before</v-icon>
+      Создать новую категорию
+    </v-btn>
+  </div>
+
+  <div v-else-if="categoriesExist && !loading">
     <v-card-title>
       Новая запись
       <v-spacer></v-spacer>

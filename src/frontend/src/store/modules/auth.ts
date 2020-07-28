@@ -30,9 +30,9 @@ const auth = {
 
     async logoutAction({ commit }: ActionContext) {
       await firebase.auth().signOut();
-      // commit('clearInfoMutation');
-      // Рабочий костыль для сброса стора
       app.$router.go();
+      // commit('clearInfoMutation');
+      // костыль для сброса стора
     },
 
     async registerAction(
