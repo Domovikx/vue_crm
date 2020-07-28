@@ -9,6 +9,9 @@ import LoaderComponent from '../../components/LoaderComponent.vue';
 
 export default Vue.extend({
   name: 'HomePage',
+  metaInfo: {
+    title: 'Счет',
+  },
 
   components: {
     HomeBillComponent,
@@ -37,6 +40,9 @@ export default Vue.extend({
   },
 
   async mounted() {
+    if (await !this.$store.getters.uidGetter) {
+      await this.$store.dispatch('fetchInfoAction');
+    }
     await this.currencyFetchAction();
     this.loading = false;
   },
@@ -58,7 +64,8 @@ export default Vue.extend({
     <v-card-title>
       Счет ({{ bill | currencyFilter(currencyBase) }})
       <v-spacer></v-spacer>
-      <v-btn color="secondary" @click="refresh">
+      <v-btn text @click="refresh">
+        <v-icon left>mdi-refresh</v-icon>
         обновить
       </v-btn>
     </v-card-title>

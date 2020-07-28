@@ -17,31 +17,13 @@ const history = {
         if (!getters.categoriesGetter) {
           await dispatch('fetchCategoriesAction');
         }
-
         if (!getters.recordsGetter) {
           await dispatch('fetchRecordsAction');
         }
 
-        const categories: Categories = getters.categoriesGetter;
         const records: Records = getters.recordsGetter;
 
-        const historyByRecords: HistoryByRecords = records.map(
-          (record: Record) => {
-            const category: UserCategory =
-              categories.find(
-                (c: UserCategory) => c.id === record.categoryId,
-              ) || {};
-
-            const historyRecord: HistoryRecord = {
-              ...record,
-              categoryTitle: category.title || '',
-            };
-
-            return historyRecord;
-          },
-        );
-
-        commit('historyByRecordsMutation', historyByRecords);
+        commit('historyByRecordsMutation', records);
       } catch (error) {
         throw error;
       }

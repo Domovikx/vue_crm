@@ -1,7 +1,7 @@
 <script lang="ts">
 import Vue from 'vue';
 
-import { mapGetters, mapActions } from 'vuex';
+import { mapGetters, mapActions, mapMutations } from 'vuex';
 
 export default Vue.extend({
   name: 'NavigationDrawerComponent',
@@ -15,26 +15,37 @@ export default Vue.extend({
       get() {
         return this.navigationDrawerGetter;
       },
-      set() {
-        // TODO:
-        // Баг на мобильной версии
-        // this.navigationDrawerAction(this.navigationDrawerGetter);
+      set(drawer: boolean) {
+        this.navigationDrawerMutation(drawer);
       },
     },
   },
 
   data: (): any => ({
     items: [
-      { title: 'Счет', url: '/', exact: true },
-      { title: 'История', url: '/history' },
-      { title: 'Планирование', url: '/planning' },
-      { title: 'Новая запись', url: '/record' },
-      { title: 'Категории', url: '/categories' },
+      {
+        title: 'Счет',
+        url: '/',
+        exact: true,
+        icon: 'mdi-credit-card-multiple',
+      },
+      { title: 'История', url: '/history', icon: 'mdi-table' },
+      {
+        title: 'Планирование',
+        url: '/planning',
+        icon: 'mdi-chart-line',
+      },
+      {
+        title: 'Новая запись',
+        url: '/record',
+        icon: 'mdi-table-column-plus-before',
+      },
+      { title: 'Категории', url: '/categories', icon: 'mdi-table-edit' },
     ],
   }),
 
   methods: {
-    ...mapActions(['navigationDrawerAction']),
+    ...mapMutations(['navigationDrawerMutation']),
   },
 });
 </script>
@@ -49,6 +60,10 @@ export default Vue.extend({
         :exact="item.exact"
         link
       >
+        <v-list-item-icon>
+          <v-icon>{{ item.icon }}</v-icon>
+        </v-list-item-icon>
+
         <v-list-item-content>
           <v-list-item-title>{{ item.title }}</v-list-item-title>
         </v-list-item-content>
@@ -57,6 +72,4 @@ export default Vue.extend({
   </v-navigation-drawer>
 </template>
 
-<style lang="scss" scoped>
-// @import '../../assets/scss/_fonts.scss';
-</style>
+<style lang="scss" scoped></style>

@@ -5,10 +5,16 @@ import { mapGetters, mapActions } from 'vuex';
 
 import LoaderComponent from '../../components/LoaderComponent.vue';
 
-import { HistoryByRecords } from '../../interfaces/History.interface';
+import {
+  HistoryByRecords,
+  HistoryRecord,
+} from '../../interfaces/History.interface';
 
 export default Vue.extend({
   name: 'HistoryPage',
+  metaInfo: {
+    title: 'История',
+  },
 
   components: {
     LoaderComponent,
@@ -21,11 +27,15 @@ export default Vue.extend({
 
     headers: [
       { text: 'Дата', value: 'date', align: 'center', sortable: true },
+      { text: 'Категория', value: 'category', sortable: true },
       { text: 'Тип', value: 'categoryType' },
       { text: 'Сумма', value: 'count' },
       { text: 'Описание', value: 'description' },
-      { text: 'Действия', value: 'id', sortable: false, align: 'center' },
+      { text: 'Действие', value: 'id', sortable: false, align: 'center' },
     ],
+
+    record: null,
+    dialogToRemove: false,
   }),
 
   computed: {
@@ -49,22 +59,38 @@ export default Vue.extend({
   },
 
   async mounted() {
+    if (await !this.$store.getters.uidGetter) {
+      await this.$store.dispatch('fetchInfoAction');
+    }
     if (!this.historyByRecordsGetter) {
       await this.historyByRecordsAction();
     }
-
     this.loading = false;
   },
 
   methods: {
-    ...mapActions(['historyByRecordsAction']),
+    ...mapActions(['historyByRecordsAction', 'removeRecordAction']),
 
-    onEdit() {
-      console.log('onEdit :>> ');
+    onEdit(item: HistoryRecord) {
+      this.$router.push({ name: 'Detail', params: { id: item.id } });
     },
 
-    onRemove() {
-      console.log('onRemove :>> ');
+    onRemove(item: HistoryRecord | any) {
+      this.record = item;
+      this.dialogToRemove = true;
+    },
+
+    async removeRecord() {
+      await this.removeRecordAction(this.record);
+      this.$router.push('/History');
+    },
+
+    customRowClass(item: HistoryRecord) {
+      const color =
+        item.categoryType === 'outcome'
+          ? 'deep-orange lighten-5'
+          : 'teal lighten-5';
+      return `cursor ${color}`;
     },
   },
 });
@@ -75,7 +101,7 @@ export default Vue.extend({
 
   <v-card v-else-if="!loading">
     <v-card-title>
-      История записей
+      История ({{ bill | currencyFilter(currencyBase) }})
       <v-spacer></v-spacer>
       <v-text-field
         v-model="search"
@@ -95,8 +121,12 @@ export default Vue.extend({
       multi-sort
     >
       <template v-slot:item="row">
-        <tr>
-          <td>{{ row.item.date | dateFilter('DD-MM-YY time') }}</td>
+        <tr :class="customRowClass(row.item)" @click="onEdit(row.item)">
+          <td>{{ row.item.date | dateFilter('DD-MM-YY') }}</td>
+
+          <td>
+            {{ row.item.categoryTitle }}
+          </td>
 
           <td>
             {{
@@ -104,7 +134,7 @@ export default Vue.extend({
             }}
           </td>
 
-          <td>{{ row.item.count }}</td>
+          <td>{{ row.item.count | currencyFilter('BYN', 3) }}</td>
 
           <td class="truncate">
             <v-tooltip bottom>
@@ -116,17 +146,42 @@ export default Vue.extend({
           </td>
 
           <td class="td-flex">
-            <v-btn fab dark small @click="onEdit(row.item.id)">
-              <v-icon dark>mdi-table-edit</v-icon>
-            </v-btn>
-
-            <v-btn fab dark small @click="onRemove(row.item.id)">
+            <v-btn icon @click.stop="onRemove(row.item)">
               <v-icon dark>mdi-delete</v-icon>
             </v-btn>
           </td>
         </tr>
       </template>
     </v-data-table>
+
+    <!-- dialogToRemove -->
+    <v-dialog v-model="dialogToRemove" max-width="290">
+      <v-card>
+        <v-card-title class="headline">
+          Удалить запись?
+        </v-card-title>
+
+        <v-card-text>
+          Внимание. Удаление записи необратимо. Подтвердите удаление записи.
+        </v-card-text>
+
+        <v-card-actions>
+          <v-spacer></v-spacer>
+
+          <v-btn color="green darken-1" text @click="dialogToRemove = false">
+            Отмена
+          </v-btn>
+
+          <v-btn
+            color="green darken-1"
+            text
+            @click="(dialogToRemove = false), removeRecord()"
+          >
+            Удалить
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-card>
 </template>
 
@@ -142,5 +197,9 @@ export default Vue.extend({
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.cursor {
+  cursor: pointer;
 }
 </style>

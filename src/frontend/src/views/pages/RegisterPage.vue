@@ -48,6 +48,12 @@ export default Vue.extend({
     ...mapGetters(['errorNotificationGetter']),
   },
 
+  async mounted() {
+    if (await !this.$store.getters.uidGetter) {
+      await this.$store.dispatch('fetchInfoAction');
+    }
+  },
+
   watch: {
     errorNotificationGetter(fbError) {
       /*
@@ -81,7 +87,6 @@ export default Vue.extend({
           name: this.userName,
         };
 
-        console.log('registerFormData :>> ', registerFormData);
         await this.registerAction(registerFormData);
         this.clearErrorNotificationMutation;
         this.$router.push('/');

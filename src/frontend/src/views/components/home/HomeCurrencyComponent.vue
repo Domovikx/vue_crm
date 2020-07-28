@@ -31,8 +31,10 @@ export default Vue.extend({
         <tbody>
           <tr v-for="symbol in currenciesKeysGetter" :key="symbol">
             <td>{{ symbol }}</td>
-            <td>{{ currency[symbol].rate }}</td>
-            <td>{{ currency[symbol].date | dateFilter('DD-MM-YYYY') }}</td>
+            <td>{{ currency[symbol].rate | currencyFilter('BYN', 3) }}</td>
+            <td>
+              {{ currency[symbol].date | dateFilter('DD-MM-YYYY') }}
+            </td>
           </tr>
         </tbody>
       </v-simple-table>

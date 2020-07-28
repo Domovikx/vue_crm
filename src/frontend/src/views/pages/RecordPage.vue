@@ -5,9 +5,13 @@ import { mapGetters, mapActions } from 'vuex';
 
 import LoaderComponent from '../../components/LoaderComponent.vue';
 import { Record } from '../../interfaces/Record.interface';
+import { Categories, UserCategory } from '../../interfaces/Category.interface';
 
 export default Vue.extend({
   name: 'RecordPage',
+  metaInfo: {
+    title: 'Добавление записи',
+  },
 
   components: {
     LoaderComponent,
@@ -15,10 +19,12 @@ export default Vue.extend({
 
   data: () => ({
     loading: true,
+    categoriesExist: false,
     valid: false,
 
     selectId: null,
 
+    categoryTitle: 'categoryTitle',
     categoryType: 'outcome',
     categoryTypeRules: [(v: string) => !!v || 'Это поле нужно заполнить'],
 
@@ -44,35 +50,55 @@ export default Vue.extend({
       return this.currencyBaseGetter;
     },
 
-    items: function (): any {
+    items: function (): Categories {
       return this.categoriesGetter;
     },
   },
 
   async mounted() {
+    if (!this.$store.getters.uidGetter) {
+      await this.$store.dispatch('fetchInfoAction');
+    }
+
     if (!this.categoriesGetter) {
       await this.fetchCategoriesAction();
     }
 
-    const items: any = this.items;
-    this.selectId = items[0].id;
-    this.loading = false;
+    if (this.categoriesGetter[0]) {
+      this.categoriesExist = true;
+      this.selectId = this.items[0].id;
+      this.loading = false;
+    } else if (!this.categoriesGetter[0]) {
+      this.categoriesExist = false;
+      this.loading = false;
+    }
   },
 
   methods: {
-    ...mapActions(['fetchCategoriesAction']),
+    ...mapActions([
+      'fetchCategoriesAction',
+      'createRecordAction',
+      'infoUpdateAction',
+    ]),
 
     async createRecord() {
       try {
+        const category: UserCategory | any = this.items.find(
+          (i: UserCategory) => i.id === this.selectId,
+        );
+
+        this.categoryTitle = category.title;
+
         const record: Record = {
           categoryId: this.selectId,
+          categoryTitle: this.categoryTitle,
           count: this.count,
           description: this.description || '',
           categoryType: this.categoryType,
           date: new Date().toJSON(),
         };
 
-        await this.$store.dispatch('createRecordAction', record);
+        await this.createRecordAction(record);
 
         let bill = 0;
         const b: number = Number(this.bill);
@@ -84,7 +110,7 @@ export default Vue.extend({
           bill = b + c;
         }
 
-        await this.$store.dispatch('infoUpdateBillAction', { bill });
+        await this.infoUpdateAction({ bill });
 
         let f: any = this.$refs.form;
         f.reset();
@@ -99,7 +125,19 @@ export default Vue.extend({
 <template>
   <LoaderComponent v-if="loading" />
 
-  <div v-else-if="!loading">
+  <div v-else-if="!categoriesExist && !loading">
+    <v-card-title>
+      Категории отсутствуют
+      <v-spacer></v-spacer>
+      {{ bill | currencyFilter(currencyBase) }}
+    </v-card-title>
+    <v-btn text block to="/categories">
+      <v-icon left>mdi-table-row-plus-before</v-icon>
+      Создать новую категорию
+    </v-btn>
+  </div>
+
+  <div v-else-if="categoriesExist && !loading">
     <v-card-title>
       Новая запись
       <v-spacer></v-spacer>
@@ -136,12 +174,8 @@ export default Vue.extend({
       <v-text-field v-model.trim="description" label="Описание"></v-text-field>
 
       <v-card-actions>
-        <v-btn
-          block
-          color="info"
-          @click.prevent="createRecord"
-          :disabled="!valid"
-        >
+        <v-btn block text @click.prevent="createRecord" :disabled="!valid">
+          <v-icon left>mdi-table-row-plus-before</v-icon>
           Создать
         </v-btn>
       </v-card-actions>

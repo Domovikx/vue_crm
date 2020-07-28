@@ -1,7 +1,7 @@
 <script lang="ts">
 import Vue from 'vue';
 
-import { mapGetters } from 'vuex';
+import { mapGetters, mapActions } from 'vuex';
 
 import LoaderComponent from '../../../components/LoaderComponent.vue';
 import { UserCategory } from '../../../interfaces/Category.interface';
@@ -17,7 +17,6 @@ export default Vue.extend({
     loading: true,
     valid: false,
 
-    // items: [],
     select: {},
     selectId: null,
 
@@ -33,7 +32,27 @@ export default Vue.extend({
         /^\d+(?:[\.,]\d+)?$/.test(v) ||
         'Это поле должно содержать только числа',
     ],
+
+    dialogToRemove: false,
   }),
+
+  async created() {
+    if (!this.categoriesGetter) {
+      await this.fetchCategoriesAction();
+    }
+
+    const select: any = this.items[0] || null;
+    if (select) {
+      this.select = select || null;
+      this.title = select.title;
+      this.limit = select.limit;
+      this.selectId = select.id;
+    }
+  },
+
+  mounted() {
+    this.loading = false;
+  },
 
   computed: {
     ...mapGetters(['categoriesGetter']),
@@ -41,21 +60,6 @@ export default Vue.extend({
     items(): any {
       return this.categoriesGetter;
     },
-  },
-
-  created() {
-    this.items = this.categoriesGetter;
-
-    const select: any = this.items[0] || null;
-
-    this.select = select || null;
-    this.title = select.title;
-    this.limit = select.limit;
-    this.selectId = select.id;
-  },
-
-  mounted() {
-    this.loading = false;
   },
 
   watch: {
@@ -70,6 +74,12 @@ export default Vue.extend({
   },
 
   methods: {
+    ...mapActions([
+      'updateCategoriesAction',
+      'removeCategoryAction',
+      'fetchCategoriesAction',
+    ]),
+
     async updateCategories() {
       try {
         const select: any = this.select;
@@ -81,9 +91,7 @@ export default Vue.extend({
 
         this.loading = true;
 
-        await this.$store.dispatch('updateCategoriesAction', categoryData);
-
-        this.items = this.categoriesGetter;
+        await this.updateCategoriesAction(categoryData);
 
         this.loading = false;
       } catch (error) {
@@ -91,30 +99,30 @@ export default Vue.extend({
       }
     },
 
+    onRemove() {
+      this.dialogToRemove = true;
+    },
+
     async removeCategory() {
-      const isRemove = confirm('Подтвердить удаление?');
-      if (isRemove) {
-        try {
-          let select: any = this.select;
-          const id = this.selectId;
+      try {
+        let select: any = this.select;
+        const id = this.selectId;
 
-          this.loading = true;
+        this.loading = true;
 
-          await this.$store.dispatch('removeCategoryAction', { id });
-          await this.$store.dispatch('fetchCategoriesAction');
-          this.items = this.categoriesGetter;
+        await this.removeCategoryAction({ id });
+        await this.fetchCategoriesAction();
 
-          // TODO отрефакторить
+        // TODO отрефакторить
 
-          select = this.items[0] || null;
-          this.select = select || null;
-          this.title = select.title || '';
-          this.limit = select.limit || '';
+        select = this.items[0] || null;
+        this.select = select || null;
+        this.title = select.title || '';
+        this.limit = select.limit || '';
 
-          this.loading = false;
-        } catch (error) {
-          throw error;
-        }
+        this.loading = false;
+      } catch (error) {
+        throw error;
       }
     },
   },
@@ -125,51 +133,72 @@ export default Vue.extend({
   <LoaderComponent v-if="loading" />
 
   <div class="col s12 m6" v-else-if="!loading">
-    <div>
-      <h3>Редактировать</h3>
+    <h3>Редактировать</h3>
 
-      <v-form ref="form" v-model="valid">
-        <v-select
-          v-model="select"
-          :items="items"
-          item-text="title"
-          item-value="id"
-          label="Выберите категорию"
-          required
-        ></v-select>
+    <v-form ref="form" v-model="valid">
+      <v-select
+        v-model="select"
+        :items="items"
+        item-text="title"
+        item-value="id"
+        label="Выберите категорию"
+        required
+      ></v-select>
 
-        <v-text-field
-          v-model="title"
-          label="Название"
-          required
-          :rules="titleRules"
-        ></v-text-field>
+      <v-text-field
+        v-model="title"
+        label="Название"
+        required
+        :rules="titleRules"
+      ></v-text-field>
 
-        <v-text-field
-          v-model="limit"
-          label="Лимит"
-          required
-          :rules="limitRules"
-        ></v-text-field>
+      <v-text-field
+        v-model="limit"
+        label="Лимит"
+        required
+        :rules="limitRules"
+      ></v-text-field>
+
+      <v-card-actions class="justify-center">
+        <v-btn text :disabled="!valid" @click="updateCategories">
+          <v-icon left>mdi-refresh</v-icon>
+          Обновить
+        </v-btn>
+        <v-btn text :disabled="!valid" @click="onRemove">
+          <v-icon left>mdi-table-row-remove</v-icon>
+          Удалить
+        </v-btn>
+      </v-card-actions>
+    </v-form>
+
+    <!-- dialogToRemove -->
+    <v-dialog v-model="dialogToRemove" max-width="290">
+      <v-card>
+        <v-card-title class="headline">
+          Удалить запись?
+        </v-card-title>
+
+        <v-card-text>
+          Внимание. Удаление записи необратимо. Подтвердите удаление записи.
+        </v-card-text>
 
         <v-card-actions>
-          <v-btn
-            block
-            color="info"
-            :disabled="!valid"
-            @click="updateCategories"
-          >
-            Обновить
+          <v-spacer></v-spacer>
+
+          <v-btn color="green darken-1" text @click="dialogToRemove = false">
+            Отмена
           </v-btn>
-        </v-card-actions>
 
-        <v-card-actions>
-          <v-btn block color="info" :disabled="!valid" @click="removeCategory">
+          <v-btn
+            color="green darken-1"
+            text
+            @click="(dialogToRemove = false), removeCategory()"
+          >
             Удалить
           </v-btn>
         </v-card-actions>
-      </v-form>
-    </div>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 

@@ -28,7 +28,7 @@ export default Vue.extend({
     ...mapActions(['createCategoryAction']),
 
     async createCategory() {
-      await this.$store.dispatch('createCategoryAction', {
+      await this.createCategoryAction({
         title: this.title,
         limit: this.limit,
       });
@@ -64,12 +64,8 @@ export default Vue.extend({
         ></v-text-field>
 
         <v-card-actions>
-          <v-btn
-            block
-            color="info"
-            @click.prevent="createCategory"
-            :disabled="!valid"
-          >
+          <v-btn text block @click.prevent="createCategory" :disabled="!valid">
+            <v-icon left>mdi-table-row-plus-before</v-icon>
             Создать
           </v-btn>
         </v-card-actions>

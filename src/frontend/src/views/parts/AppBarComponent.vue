@@ -1,7 +1,7 @@
 <script lang="ts">
 import Vue from 'vue';
 
-import { mapActions, mapGetters } from 'vuex';
+import { mapActions, mapGetters, mapMutations } from 'vuex';
 
 export default Vue.extend({
   name: 'AppBarComponent',
@@ -36,11 +36,8 @@ export default Vue.extend({
   },
 
   methods: {
-    ...mapActions([
-      'navigationDrawerAction',
-      'logoutAction',
-      'fetchInfoAction',
-    ]),
+    ...mapActions(['logoutAction', 'fetchInfoAction']),
+    ...mapMutations(['navigationDrawerMutation']),
 
     async logout() {
       await this.logoutAction();
@@ -48,7 +45,7 @@ export default Vue.extend({
     },
 
     clickBurgerMenu() {
-      this.navigationDrawerAction(this.navigationDrawerGetter);
+      this.navigationDrawerMutation(!this.navigationDrawerGetter);
     },
   },
 });
@@ -73,19 +70,20 @@ export default Vue.extend({
           v-bind="attrs"
           v-on="on"
         >
-          {{ userName }}
+          <v-icon>mdi-account</v-icon>
+          <span class="truncate">{{ userName }}</span>
         </v-btn>
       </template>
-      <v-list class="user-menu-list">
-        <v-list-item>
-          <v-btn text class="btn btn__menu-item" to="/Profile" tag="button">
-            Профиль
-          </v-btn>
+
+      <v-list nav class="user-menu-list">
+        <v-list-item to="/Profile">
+          <v-icon left>mdi-account-edit</v-icon>
+          <v-list-item-title>Профиль</v-list-item-title>
         </v-list-item>
-        <v-list-item>
-          <v-btn text class="btn btn__menu-item" @click.prevent="logout">
-            Выйти
-          </v-btn>
+
+        <v-list-item @click.prevent="logout">
+          <v-icon left>mdi-logout</v-icon>
+          <v-list-item-title>Выйти</v-list-item-title>
         </v-list-item>
       </v-list>
     </v-menu>
@@ -98,5 +96,15 @@ export default Vue.extend({
 }
 .v-menu__content {
   margin-top: 20px;
+}
+.truncate {
+  min-width: 100px;
+  max-width: 1px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  @media (max-width: 600px) {
+    min-width: auto;
+  }
 }
 </style>

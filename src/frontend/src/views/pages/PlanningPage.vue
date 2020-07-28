@@ -1,7 +1,7 @@
 <script lang="ts">
 import Vue from 'vue';
 
-import { mapGetters } from 'vuex';
+import { mapGetters, mapActions } from 'vuex';
 
 import LoaderComponent from '../../components/LoaderComponent.vue';
 
@@ -9,6 +9,9 @@ import { PlanningsByCategories } from '../../interfaces/PlanningByCategory.inter
 
 export default Vue.extend({
   name: 'PlanningPage',
+  metaInfo: {
+    title: 'Планирование',
+  },
 
   components: {
     LoaderComponent,
@@ -19,7 +22,10 @@ export default Vue.extend({
   }),
 
   async mounted() {
-    await this.$store.dispatch('getPlanningsAction');
+    if (await !this.$store.getters.uidGetter) {
+      await this.$store.dispatch('fetchInfoAction');
+    }
+    await this.getPlanningsAction();
     this.loading = false;
   },
 
@@ -46,6 +52,10 @@ export default Vue.extend({
     records: function (): any {
       return this.recordsGetter;
     },
+  },
+
+  methods: {
+    ...mapActions(['getPlanningsAction']),
   },
 });
 </script>

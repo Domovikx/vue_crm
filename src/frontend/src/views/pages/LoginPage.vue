@@ -7,6 +7,9 @@ import commonMessages from '../../utils/commonMessages';
 
 export default Vue.extend({
   name: 'LoginPage',
+  metaInfo: {
+    title: 'Теневая Бухгалтерия - ВХОД',
+  },
 
   data: () => ({
     valid: true,
