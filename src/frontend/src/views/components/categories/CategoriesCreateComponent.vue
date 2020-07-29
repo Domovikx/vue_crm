@@ -44,9 +44,9 @@ export default Vue.extend({
 </script>
 
 <template>
-  <div class="col s12 m6">
-    <div>
-      <h3>Создать</h3>
+  <v-col cols="12" sm="12" md="6" lg="3" xl="3">
+    <v-card color="backgroundMain" outlined>
+      <v-card-title>Создать категорию</v-card-title>
 
       <v-form ref="form" v-model="valid">
         <v-text-field
@@ -70,6 +70,6 @@ export default Vue.extend({
           </v-btn>
         </v-card-actions>
       </v-form>
-    </div>
-  </div>
+    </v-card>
+  </v-col>
 </template>

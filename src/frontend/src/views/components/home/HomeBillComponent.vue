@@ -22,8 +22,8 @@ export default Vue.extend({
 </script>
 
 <template>
-  <div class="col s12 m6 l4">
-    <v-card>
+  <v-col cols="12" sm="12" md="6">
+    <v-card color="backgroundMain" outlined>
       <v-card-title>Счет в валюте</v-card-title>
       <v-simple-table>
         <thead>
@@ -41,5 +41,5 @@ export default Vue.extend({
         </tbody>
       </v-simple-table>
     </v-card>
-  </div>
+  </v-col>
 </template>

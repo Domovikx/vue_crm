@@ -25,6 +25,7 @@
     "noreferrer",
     "nuxt",
     "prefetch",
+    "prepend",
     "tbody",
     "thead",
     "vuelidate",

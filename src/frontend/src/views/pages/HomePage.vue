@@ -60,7 +60,7 @@ export default Vue.extend({
 </script>
 
 <template>
-  <div>
+  <v-card color="backgroundMain" outlined>
     <v-card-title>
       Счет ({{ bill | currencyFilter(currencyBase) }})
       <v-spacer></v-spacer>
@@ -72,9 +72,15 @@ export default Vue.extend({
 
     <LoaderComponent v-if="loading" />
 
-    <div v-else-if="!loading" class="row">
+    <v-row v-else-if="!loading">
       <HomeBillComponent :currency="currency" />
       <HomeCurrencyComponent :currency="currency" />
-    </div>
-  </div>
+    </v-row>
+  </v-card>
 </template>
+
+<style lang="scss" scoped>
+.v-card {
+  border: 0;
+}
+</style>

@@ -99,7 +99,7 @@ export default Vue.extend({
 <template>
   <LoaderComponent v-if="loading" />
 
-  <v-card v-else-if="!loading">
+  <v-card v-else-if="!loading" color="backgroundMain" outlined>
     <v-card-title>
       История ({{ bill | currencyFilter(currencyBase) }})
       <v-spacer></v-spacer>

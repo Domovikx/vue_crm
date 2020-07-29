@@ -4,6 +4,7 @@ export interface Record {
   categoryType?: string | any;
   categoryTitle?: string | any;
   count?: number | any;
+  marker?: string | any;
   description?: string | any;
   date?: string | any;
 }

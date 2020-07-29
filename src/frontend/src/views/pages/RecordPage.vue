@@ -20,6 +20,7 @@ export default Vue.extend({
   data: () => ({
     loading: true,
     categoriesExist: false,
+
     valid: false,
 
     selectId: null,
@@ -35,6 +36,8 @@ export default Vue.extend({
         /^\d+(?:[\.,]\d+)?$/.test(v) ||
         'Это поле должно содержать только числа',
     ],
+
+    marker: null,
 
     description: null,
   }),
@@ -93,6 +96,7 @@ export default Vue.extend({
           categoryId: this.selectId,
           categoryTitle: this.categoryTitle,
           count: this.count,
+          marker: this.marker,
           description: this.description || '',
           categoryType: this.categoryType,
           date: new Date().toJSON(),
@@ -170,6 +174,8 @@ export default Vue.extend({
         :rules="countRules"
         required
       ></v-text-field>
+
+      <v-text-field v-model.trim="marker" label="Метка"></v-text-field>
 
       <v-text-field v-model.trim="description" label="Описание"></v-text-field>
 
