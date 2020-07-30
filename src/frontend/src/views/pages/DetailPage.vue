@@ -6,6 +6,7 @@ import LoaderComponent from '../../components/LoaderComponent.vue';
 
 import { Record } from '../../interfaces/Record.interface';
 import { Categories, UserCategory } from '../../interfaces/Category.interface';
+import { ThisWindow } from '../../interfaces/ThisWindow.interface';
 
 export default Vue.extend({
   name: 'DetailPage',
@@ -95,7 +96,7 @@ export default Vue.extend({
   },
 
   computed: {
-    ...mapGetters(['recordByIdGetter', 'categoriesGetter']),
+    ...mapGetters(['recordByIdGetter', 'categoriesGetter', 'windowGetter']),
 
     record(): Record {
       return this.recordByIdGetter;
@@ -103,6 +104,10 @@ export default Vue.extend({
 
     categoriesAll(): Categories {
       return this.categoriesGetter;
+    },
+
+    window(): ThisWindow {
+      return this.windowGetter;
     },
   },
 
@@ -171,12 +176,12 @@ interface CategoryItem {
 
   <v-card v-else-if="!loading">
     <v-card-title :class="categoryColor">
-      {{ categoryTitle }} - {{ categoryText }}
+      <span :class="window.isMobile ? 'truncate' : ''"
+        >{{ categoryTitle }} - {{ categoryText }}</span
+      >
       <v-spacer></v-spacer>
       <v-btn icon to="/History">
-        <v-icon dark>
-          mdi-close-circle
-        </v-icon>
+        <v-icon> mdi-close-circle </v-icon>
       </v-btn>
     </v-card-title>
 
@@ -253,22 +258,43 @@ interface CategoryItem {
       </v-container>
     </v-form>
 
-    <v-card-actions>
-      <v-spacer></v-spacer>
-
-      <v-btn text @click="onRemove">
+    <v-card-actions class="v-card-actions">
+      <!-- btn remove -->
+      <v-btn v-if="window.isMobile" icon large @click="onRemove">
+        <v-icon>mdi-table-row-remove</v-icon>
+      </v-btn>
+      <v-btn v-else-if="!window.isMobile" text @click="onRemove">
         <v-icon left>mdi-table-row-remove</v-icon>
         удалить
       </v-btn>
 
-      <v-btn text @click="onSave" :disabled="!valid">
-        <v-icon left>mdi-refresh</v-icon>
-        сохранить
+      <!-- btn to history -->
+      <v-btn v-if="window.isMobile" icon large to="/History">
+        <v-icon>mdi-chart-line</v-icon>
       </v-btn>
-
-      <v-btn text to="/History">
+      <v-btn v-else-if="!window.isMobile" text to="/History">
         <v-icon left>mdi-chart-line</v-icon>
         История
+      </v-btn>
+
+      <!-- btn save -->
+      <v-btn
+        v-if="window.isMobile"
+        icon
+        large
+        @click="onSave"
+        :disabled="!valid"
+      >
+        <v-icon>mdi-content-save</v-icon>
+      </v-btn>
+      <v-btn
+        v-else-if="!window.isMobile"
+        text
+        @click="onSave"
+        :disabled="!valid"
+      >
+        <v-icon left>mdi-content-save</v-icon>
+        сохранить
       </v-btn>
     </v-card-actions>
 
@@ -302,3 +328,22 @@ interface CategoryItem {
     </v-dialog>
   </v-card>
 </template>
+
+<style lang="scss" scoped>
+.v-card-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+@media (max-width: 600px) {
+  .truncate {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 200px;
+  }
+  .v-card-actions {
+    display: flex;
+    justify-content: space-evenly;
+  }
+}
+</style>

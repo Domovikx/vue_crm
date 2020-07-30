@@ -11,6 +11,7 @@ import category from './modules/category';
 import record from './modules/record';
 import plannings from './modules/plannings';
 import history from './modules/history';
+import window from './modules/window';
 
 Vue.use(Vuex);
 
@@ -26,5 +27,6 @@ export default new Vuex.Store({
     record,
     plannings,
     history,
+    window,
   },
 });

@@ -36,7 +36,16 @@ export default Vue.extend({
         <tbody>
           <tr v-for="symbol of currenciesKeysGetter" :key="symbol">
             <td>{{ symbol }}</td>
-            <td>{{ getCurrency(symbol) | currencyFilter(symbol) }}</td>
+            <td>
+              {{
+                getCurrency(symbol)
+                  | currencyFilter({
+                    style: 'currency',
+                    currency: symbol,
+                    maximumFractionDigits: 2,
+                  })
+              }}
+            </td>
           </tr>
         </tbody>
       </v-simple-table>

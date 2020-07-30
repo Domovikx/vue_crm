@@ -1,7 +1,7 @@
 <script lang="ts">
 import Vue from 'vue';
 
-import { mapGetters, mapActions } from 'vuex';
+import { mapGetters, mapActions, mapMutations } from 'vuex';
 
 import AppBarComponent from '../parts/AppBarComponent.vue';
 import FooterComponent from '../parts/FooterComponent.vue';
@@ -26,10 +26,17 @@ export default Vue.extend({
 
   data: () => ({
     loading: true,
+
+    window: {
+      width: 0,
+      height: 0,
+      isMobile: false,
+    },
   }),
 
-  computed: {
-    ...mapGetters(['infoGetter']),
+  async created() {
+    window.addEventListener('resize', this.handleResize);
+    await this.handleResize();
   },
 
   async mounted() {
@@ -41,8 +48,35 @@ export default Vue.extend({
     }
   },
 
+  destroyed() {
+    window.removeEventListener('resize', this.handleResize);
+  },
+
+  computed: {
+    ...mapGetters(['infoGetter']),
+
+    isMobile() {
+      if (
+        /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+          navigator.userAgent,
+        )
+      ) {
+        return true;
+      }
+      return false;
+    },
+  },
+
   methods: {
     ...mapActions(['fetchInfoAction']),
+    ...mapMutations(['windowMutation']),
+
+    handleResize() {
+      this.window.width = window.innerWidth;
+      this.window.height = window.innerHeight;
+      this.window.isMobile = this.isMobile;
+      this.windowMutation(this.window);
+    },
   },
 });
 </script>
@@ -63,4 +97,11 @@ export default Vue.extend({
   </v-app>
 </template>
 
-<style lang="scss"></style>
+<style lang="scss">
+.truncate {
+  max-width: 1px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+</style>

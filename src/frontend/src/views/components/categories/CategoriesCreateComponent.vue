@@ -58,7 +58,7 @@ export default Vue.extend({
 
         <v-text-field
           v-model.trim="limit"
-          label="Лимит (максимальный расход)"
+          label="Лимит (план на месяц)"
           :rules="limitRules"
           required
         ></v-text-field>

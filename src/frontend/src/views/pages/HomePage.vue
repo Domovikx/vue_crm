@@ -6,6 +6,7 @@ import { mapActions, mapGetters } from 'vuex';
 import HomeBillComponent from '../components/home/HomeBillComponent.vue';
 import HomeCurrencyComponent from '../components/home/HomeCurrencyComponent.vue';
 import LoaderComponent from '../../components/LoaderComponent.vue';
+import { ThisWindow } from '../../interfaces/ThisWindow.interface';
 
 export default Vue.extend({
   name: 'HomePage',
@@ -23,8 +24,21 @@ export default Vue.extend({
     loading: true,
   }),
 
+  async mounted() {
+    if (await !this.$store.getters.uidGetter) {
+      await this.$store.dispatch('fetchInfoAction');
+    }
+    await this.currencyFetchAction();
+    this.loading = false;
+  },
+
   computed: {
-    ...mapGetters(['currenciesGetter', 'currencyBaseGetter', 'infoBillGetter']),
+    ...mapGetters([
+      'currenciesGetter',
+      'currencyBaseGetter',
+      'infoBillGetter',
+      'windowGetter',
+    ]),
 
     currency(): any {
       return this.currenciesGetter;
@@ -37,14 +51,10 @@ export default Vue.extend({
     bill(): any {
       return this.infoBillGetter;
     },
-  },
 
-  async mounted() {
-    if (await !this.$store.getters.uidGetter) {
-      await this.$store.dispatch('fetchInfoAction');
-    }
-    await this.currencyFetchAction();
-    this.loading = false;
+    window(): ThisWindow {
+      return this.windowGetter;
+    },
   },
 
   methods: {
@@ -62,11 +72,22 @@ export default Vue.extend({
 <template>
   <v-card color="backgroundMain" outlined>
     <v-card-title>
-      Счет ({{ bill | currencyFilter(currencyBase) }})
-      <v-spacer></v-spacer>
-      <v-btn text @click="refresh">
+      Счет ({{
+        bill
+          | currencyFilter({
+            style: 'currency',
+            currency: currencyBase,
+            maximumFractionDigits: 2,
+          })
+      }}) <v-spacer></v-spacer>
+
+      <!-- btn refresh -->
+      <v-btn v-if="window.isMobile" icon large @click="refresh">
+        <v-icon large>mdi-refresh</v-icon>
+      </v-btn>
+      <v-btn v-else-if="!window.isMobile" text @click="refresh">
         <v-icon left>mdi-refresh</v-icon>
-        обновить
+        <span>обновить</span>
       </v-btn>
     </v-card-title>
 

@@ -29,7 +29,6 @@ export default Vue.extend({
   <v-col cols="12" sm="12" md="12" lg="6" xl="6">
     <v-card color="backgroundMain" outlined>
       <v-card-title>Список всех категорий</v-card-title>
-
       <v-data-table :headers="headers" :items="items"> </v-data-table>
     </v-card>
   </v-col>

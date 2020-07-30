@@ -132,8 +132,6 @@ export default Vue.extend({
   <div v-else-if="!categoriesExist && !loading">
     <v-card-title>
       Категории отсутствуют
-      <v-spacer></v-spacer>
-      {{ bill | currencyFilter(currencyBase) }}
     </v-card-title>
     <v-btn text block to="/categories">
       <v-icon left>mdi-table-row-plus-before</v-icon>
@@ -144,8 +142,6 @@ export default Vue.extend({
   <div v-else-if="categoriesExist && !loading">
     <v-card-title>
       Новая запись
-      <v-spacer></v-spacer>
-      {{ bill | currencyFilter(currencyBase) }}
     </v-card-title>
 
     <v-form ref="form" v-model="valid">

@@ -7,6 +7,8 @@ import {
 } from '@/interfaces/History.interface';
 
 const history = {
+  // TODO РЕФАКТОРИТЬ!!!
+
   state: {
     historyByRecords: null,
   },

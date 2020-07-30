@@ -9,6 +9,8 @@ import {
   HistoryByRecords,
   HistoryRecord,
 } from '../../interfaces/History.interface';
+import { Records } from '../../interfaces/Record.interface';
+import { ThisWindow } from '../../interfaces/ThisWindow.interface';
 
 export default Vue.extend({
   name: 'HistoryPage',
@@ -25,14 +27,11 @@ export default Vue.extend({
 
     search: '',
 
-    headers: [
-      { text: 'Дата', value: 'date', align: 'center', sortable: true },
-      { text: 'Категория', value: 'category', sortable: true },
-      { text: 'Тип', value: 'categoryType' },
-      { text: 'Сумма', value: 'count' },
-      { text: 'Описание', value: 'description' },
-      { text: 'Действие', value: 'id', sortable: false, align: 'center' },
-    ],
+    currencyOptions: {
+      style: 'currency',
+      currency: 'BYN',
+      maximumFractionDigits: 2,
+    },
 
     record: null,
     dialogToRemove: false,
@@ -43,6 +42,8 @@ export default Vue.extend({
       'historyByRecordsGetter',
       'infoBillGetter',
       'currencyBaseGetter',
+      'recordsGetter',
+      'windowGetter',
     ]),
 
     bill: function (): string {
@@ -53,8 +54,31 @@ export default Vue.extend({
       return this.currencyBaseGetter;
     },
 
-    items: function (): HistoryByRecords {
-      return this.historyByRecordsGetter;
+    items: function (): Records {
+      return this.recordsGetter;
+    },
+
+    window(): ThisWindow {
+      return this.windowGetter;
+    },
+
+    headers() {
+      if (!this.window.isMobile) {
+        return [
+          { text: 'Дата', value: 'date', align: 'center', sortable: true },
+          { text: 'Категория', value: 'category', sortable: true },
+          { text: 'Тип', value: 'categoryType' },
+          { text: 'Сумма', value: 'count' },
+          { text: 'Метка', value: 'marker' },
+          { text: 'Действие', value: 'id', sortable: false, align: 'center' },
+        ];
+      } else if (this.window.isMobile) {
+        return [
+          { text: 'Сумма', value: 'count' },
+          { text: 'Метка', value: 'marker' },
+          { text: 'Действие', value: 'id', sortable: false, align: 'center' },
+        ];
+      }
     },
   },
 
@@ -101,16 +125,20 @@ export default Vue.extend({
 
   <v-card v-else-if="!loading" color="backgroundMain" outlined>
     <v-card-title>
-      История ({{ bill | currencyFilter(currencyBase) }})
+      История
       <v-spacer></v-spacer>
-      <v-text-field
-        v-model="search"
-        append-icon="mdi-magnify"
-        label="Найти"
-        single-line
-        hide-details
-      ></v-text-field>
+      <v-col cols="12" sm="8" md="6">
+        <v-text-field
+          v-model="search"
+          append-icon="mdi-magnify"
+          label="Найти"
+          single-line
+          hide-details
+        ></v-text-field>
+      </v-col>
     </v-card-title>
+
+    <div>Итория за период</div>
 
     <v-data-table
       :headers="headers"
@@ -122,26 +150,35 @@ export default Vue.extend({
     >
       <template v-slot:item="row">
         <tr :class="customRowClass(row.item)" @click="onEdit(row.item)">
-          <td>{{ row.item.date | dateFilter('DD-MM-YY') }}</td>
+          <td v-if="!window.isMobile">
+            {{ row.item.date | dateFilter('DD-MM-YY') }}
+          </td>
 
-          <td>
+          <td v-if="!window.isMobile">
             {{ row.item.categoryTitle }}
           </td>
 
-          <td>
+          <td v-if="!window.isMobile">
             {{
               row.item.categoryType | categoryTypeFilter(row.item.categoryType)
             }}
           </td>
 
-          <td>{{ row.item.count | currencyFilter('BYN', 3) }}</td>
+          <td>
+            {{
+              row.item.count
+                | currencyFilter({
+                  maximumFractionDigits: 2,
+                })
+            }}
+          </td>
 
-          <td class="truncate">
+          <td>
             <v-tooltip bottom>
               <template v-slot:activator="{ on, attrs }">
-                <span v-bind="attrs" v-on="on">{{ row.item.description }}</span>
+                <span v-bind="attrs" v-on="on">{{ row.item.marker }}</span>
               </template>
-              <span>{{ row.item.description }}</span>
+              <span>{{ row.item.description || row.item.marker }}</span>
             </v-tooltip>
           </td>
 
@@ -190,13 +227,6 @@ export default Vue.extend({
   display: flex;
   align-items: center;
   justify-content: space-evenly;
-}
-
-.truncate {
-  max-width: 1px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .cursor {

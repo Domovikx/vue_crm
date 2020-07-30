@@ -31,7 +31,16 @@ export default Vue.extend({
         <tbody>
           <tr v-for="symbol in currenciesKeysGetter" :key="symbol">
             <td>{{ symbol }}</td>
-            <td>{{ currency[symbol].rate | currencyFilter('BYN', 3) }}</td>
+            <td>
+              {{
+                currency[symbol].rate
+                  | currencyFilter({
+                    style: 'currency',
+                    currency: symbol,
+                    maximumFractionDigits: 3,
+                  })
+              }}
+            </td>
             <td>
               {{ currency[symbol].date | dateFilter('DD-MM-YYYY') }}
             </td>
