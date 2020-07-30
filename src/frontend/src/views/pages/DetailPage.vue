@@ -25,7 +25,9 @@ export default Vue.extend({
 
     locale: 'ru-RU',
 
-    categorySelect: {},
+    categorySelect: {
+      type: 'outcome',
+    },
     categoryItems: [
       {
         type: 'outcome',
@@ -72,7 +74,8 @@ export default Vue.extend({
       (c: CategoryItem) => this.record.categoryType === c.type,
     );
     this.categorySelect = categorySelect;
-    this.date = new Date(this.record.date).toISOString().substr(0, 10);
+
+    this.date = await new Date(this.record.date).toISOString().substr(0, 10);
     this.count = this.record.count;
     this.description = this.record.description;
 
@@ -116,9 +119,11 @@ export default Vue.extend({
       const select: CategoryItem | any = this.categoryItems.find(
         (c: CategoryItem) => c.type === type,
       );
-      this.categoryType = select.type;
-      this.categoryColor = select.color;
-      this.categoryText = select.text;
+      if (select) {
+        this.categoryType = select.type;
+        this.categoryColor = select.color;
+        this.categoryText = select.text;
+      }
     },
 
     categoryTypeSelect(id) {
@@ -126,8 +131,10 @@ export default Vue.extend({
       const select: UserCategory | any = categoriesAll.find(
         (c: UserCategory) => c.id === id,
       );
-      this.categoryTitle = select.title;
-      this.categoryId = select.id;
+      if (select) {
+        this.categoryTitle = select.title;
+        this.categoryId = select.id;
+      }
     },
   },
 
