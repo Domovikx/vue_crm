@@ -28,10 +28,14 @@ const record = {
       try {
         const uid: string = getters.uidGetter;
 
-        await firebase.database().ref(`/users/${uid}/records`).push(record);
+        const id = (
+          await firebase.database().ref(`/users/${uid}/records`).push(record)
+        ).key;
 
         await dispatch('fetchRecordsAction');
         await dispatch('historyByRecordsAction');
+
+        return { ...record, id };
       } catch (error) {
         throw error;
       }

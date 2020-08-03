@@ -1,5 +1,6 @@
 const validationRules = {
-  validMustBeFilled: (v: string) => !!v || 'Это поле нужно заполнить',
+  validMustBeFilled: (v: string) =>
+    Number(v) === 0 || !!v || 'Это поле нужно заполнить',
 
   validOnlyLetters: (v: string) =>
     /^[a-zа-яё]+$/iu.test(v) ||
@@ -9,7 +10,7 @@ const validationRules = {
   validOnlyNumbers: (v: string) =>
     /^\d+(?:[\.,]\d+)?$/.test(v) ||
     !v ||
-    'Это поле должно содержать только числа',
+    'Это поле должно содержать только положительные числа',
 };
 
 export default validationRules;

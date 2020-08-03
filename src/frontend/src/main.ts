@@ -8,6 +8,7 @@ import VueMeta from 'vue-meta';
 import dateFilter from './filters/dateFilter';
 import currencyFilter from './filters/currencyFilter';
 import categoryTypeFilter from './filters/categoryTypeFilter';
+import momentFilter from './filters/momentFilter';
 
 import './registerServiceWorker';
 import 'idempotent-babel-polyfill';
@@ -24,6 +25,7 @@ Vue.config.productionTip = false;
 Vue.filter('dateFilter', dateFilter);
 Vue.filter('currencyFilter', currencyFilter);
 Vue.filter('categoryTypeFilter', categoryTypeFilter);
+Vue.filter('momentFilter', momentFilter);
 
 Vue.use(VueMeta);
 

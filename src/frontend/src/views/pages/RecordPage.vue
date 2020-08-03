@@ -1,13 +1,16 @@
 <script lang="ts">
 import Vue from 'vue';
+import moment from 'moment';
 
 import { mapGetters, mapActions } from 'vuex';
 
 import LoaderComponent from '../../components/LoaderComponent.vue';
-import { Record } from '../../interfaces/Record.interface';
-import { Categories, UserCategory } from '../../interfaces/Category.interface';
+import CreatedRecordsComponent from '../components/record/CreatedRecordsComponent.vue';
 
 import validationRules from '../../utils/validationRules';
+
+import { Record } from '../../interfaces/Record.interface';
+import { Categories, UserCategory } from '../../interfaces/Category.interface';
 
 export default Vue.extend({
   name: 'RecordPage',
@@ -17,6 +20,7 @@ export default Vue.extend({
 
   components: {
     LoaderComponent,
+    CreatedRecordsComponent,
   },
 
   data: () => ({
@@ -37,6 +41,12 @@ export default Vue.extend({
     marker: null,
 
     description: null,
+
+    locale: 'ru-Ru',
+    datePickerToday: false,
+    dateToday: '',
+
+    createdRecords: [] as Record[],
   }),
 
   computed: {
@@ -56,14 +66,11 @@ export default Vue.extend({
   },
 
   async mounted() {
-    if (this.categoriesGetter[0]) {
-      this.categoriesExist = true;
-      this.selectId = this.items[0].id;
-      this.loading = false;
-    } else if (!this.categoriesGetter[0]) {
-      this.categoriesExist = false;
-      this.loading = false;
-    }
+    await this.checkAvailabilityData();
+
+    this.checkCategoryExistence();
+
+    this.setDates();
   },
 
   methods: {
@@ -91,7 +98,8 @@ export default Vue.extend({
           date: new Date().toJSON(),
         };
 
-        await this.createRecordAction(record);
+        const lastRecord = await this.createRecordAction(record);
+        this.createdRecords.push(lastRecord);
 
         let bill = 0;
         const b: number = Number(this.bill);
@@ -105,8 +113,7 @@ export default Vue.extend({
 
         await this.infoUpdateAction({ bill });
 
-        let f: any = this.$refs.form;
-        f.reset();
+        this.resetForm();
       } catch (error) {
         throw error;
       }
@@ -116,18 +123,40 @@ export default Vue.extend({
       if (!this.$store.getters.uidGetter) {
         await this.$store.dispatch('fetchInfoAction');
       }
-
       if (!this.categoriesGetter) {
         await this.fetchCategoriesAction();
       }
+    },
+
+    checkCategoryExistence() {
+      if (this.categoriesGetter[0]) {
+        this.categoriesExist = true;
+        this.selectId = this.items[0].id;
+        this.loading = false;
+      } else if (!this.categoriesGetter[0]) {
+        this.categoriesExist = false;
+        this.loading = false;
+      }
+    },
+
+    setDates() {
+      this.dateToday = moment(new Date()).format('YYYY-MM-DD');
+    },
+
+    async resetForm() {
+      this.count = 0;
+      this.categoryType = 'outcome';
+      this.description = null;
     },
   },
 });
 </script>
 
 <template>
+  <!-- Loader -->
   <LoaderComponent v-if="loading" />
 
+  <!-- Categories do not exist -->
   <div v-else-if="!categoriesExist && !loading">
     <v-card-title>
       Категории отсутствуют
@@ -138,49 +167,92 @@ export default Vue.extend({
     </v-btn>
   </div>
 
+  <!-- Categories exist -->
   <div v-else-if="categoriesExist && !loading">
     <v-card-title>
       Новая запись
     </v-card-title>
 
     <v-form ref="form" v-model="valid">
-      <div class="input-field">
-        <v-select
-          v-model="selectId"
-          :items="items"
-          item-text="title"
-          item-value="id"
-          label="Выберите категорию"
+      <v-row>
+        <v-col class="input-field" cols="12" sm="6" md="6">
+          <v-select
+            v-model="selectId"
+            :items="items"
+            item-text="title"
+            item-value="id"
+            label="Выберите категорию"
+            :rules="[validationRules.validMustBeFilled]"
+          ></v-select>
+        </v-col>
+
+        <!-- datePickerToday -->
+        <v-col cols="12" sm="6" md="6">
+          <v-menu
+            v-model="datePickerToday"
+            :close-on-content-click="false"
+            transition="scale-transition"
+            offset-y
+            max-width="290px"
+            min-width="290px"
+          >
+            <template v-slot:activator="{ on, attrs }">
+              <v-text-field
+                v-model="dateToday"
+                label="Начало периода"
+                persistent-hint
+                prepend-icon="mdi-calendar"
+                readonly
+                v-bind="attrs"
+                v-on="on"
+              ></v-text-field>
+            </template>
+            <v-date-picker
+              v-model="dateToday"
+              @input="datePickerToday = false"
+              locale="locale"
+              first-day-of-week="1"
+            ></v-date-picker>
+          </v-menu>
+        </v-col>
+      </v-row>
+
+      <v-row justify="center">
+        <v-radio-group
+          row
+          v-model="categoryType"
+          :mandatory="false"
           :rules="[validationRules.validMustBeFilled]"
-        ></v-select>
-      </div>
+        >
+          <v-radio label="Расход" value="outcome"></v-radio>
+          <v-radio label="Доход" value="income"></v-radio>
+        </v-radio-group>
+      </v-row>
 
-      <v-radio-group
-        v-model="categoryType"
-        :mandatory="false"
-        :rules="[validationRules.validMustBeFilled]"
-      >
-        <v-radio label="Расход" value="outcome"></v-radio>
-        <v-radio label="Доход" value="income"></v-radio>
-      </v-radio-group>
+      <v-row>
+        <v-col cols="12" sm="6" md="6">
+          <v-text-field
+            type="number"
+            v-model.number="count"
+            label="Счет / Общая сумма"
+            :rules="[
+              validationRules.validMustBeFilled,
+              validationRules.validOnlyNumbers,
+            ]"
+            required
+            clearable
+          ></v-text-field>
+        </v-col>
 
-      <v-text-field
-        v-model.number="count"
-        label="Счет / Общая сумма"
-        :rules="[
-          validationRules.validMustBeFilled,
-          validationRules.validOnlyNumbers,
-        ]"
-        required
-        clearable
-      ></v-text-field>
-
-      <v-text-field
-        v-model.trim="marker"
-        label="Метка"
-        :rules="[validationRules.validOnlyLetters]"
-        clearable
-      ></v-text-field>
+        <v-col cols="12" sm="6" md="6">
+          <v-text-field
+            v-model.trim="marker"
+            label="Метка"
+            :rules="[validationRules.validOnlyLetters]"
+            clearable
+          ></v-text-field>
+        </v-col>
+      </v-row>
 
       <v-text-field
         v-model.trim="description"
@@ -195,6 +267,11 @@ export default Vue.extend({
         </v-btn>
       </v-card-actions>
     </v-form>
+
+    <CreatedRecordsComponent
+      v-if="createdRecords[0]"
+      :createdRecords="createdRecords"
+    />
   </div>
 </template>
 
