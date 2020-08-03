@@ -34,6 +34,7 @@ const info = {
       }
     },
 
+    // todo infoUpdateBillAction == infoUpdateAction
     async infoUpdateAction(
       { commit, getters }: ActionContext,
       { bill, name }: Info,

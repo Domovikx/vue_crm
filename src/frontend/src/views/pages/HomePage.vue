@@ -25,10 +25,7 @@ export default Vue.extend({
   }),
 
   async mounted() {
-    if (await !this.$store.getters.uidGetter) {
-      await this.$store.dispatch('fetchInfoAction');
-    }
-    await this.currencyFetchAction();
+    await this.checkAvailabilityData();
     this.loading = false;
   },
 
@@ -64,6 +61,13 @@ export default Vue.extend({
       this.loading = true;
       await this.currencyFetchAction();
       this.loading = false;
+    },
+
+    async checkAvailabilityData() {
+      if (await !this.$store.getters.uidGetter) {
+        await this.$store.dispatch('fetchInfoAction');
+      }
+      await this.currencyFetchAction();
     },
   },
 });

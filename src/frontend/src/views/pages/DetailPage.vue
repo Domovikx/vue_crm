@@ -8,6 +8,8 @@ import { Record } from '../../interfaces/Record.interface';
 import { Categories, UserCategory } from '../../interfaces/Category.interface';
 import { ThisWindow } from '../../interfaces/ThisWindow.interface';
 
+import validationRules from '../../utils/validationRules';
+
 export default Vue.extend({
   name: 'DetailPage',
   metaInfo: {
@@ -19,6 +21,8 @@ export default Vue.extend({
   },
 
   data: () => ({
+    validationRules,
+
     loading: true,
     valid: false,
     id: null || '',
@@ -40,7 +44,6 @@ export default Vue.extend({
         color: 'teal lighten-4',
       },
     ],
-    categoryTypeRules: [(v: string) => !!v || 'Это поле нужно заполнить'],
 
     categoryTitle: '',
     categoryId: '',
@@ -51,15 +54,10 @@ export default Vue.extend({
 
     date: '',
     dateModal: false,
-    dateRules: [(v: string) => !!v || 'Это поле нужно заполнить'],
 
     count: null,
-    countRules: [
-      (v: string) => !!v || 'Это поле нужно заполнить',
-      (v: string) =>
-        /^\d+(?:[\.,]\d+)?$/.test(v) ||
-        'Это поле должно содержать только числа',
-    ],
+
+    marker: '',
 
     description: null,
 
@@ -67,6 +65,8 @@ export default Vue.extend({
   }),
 
   async created() {
+    await this.checkAvailabilityData();
+
     this.id = this.$route.params.id;
     await this.getRecordByIdAction(this.id);
 
@@ -92,9 +92,7 @@ export default Vue.extend({
   },
 
   async mounted() {
-    if (await !this.$store.getters.uidGetter) {
-      await this.$store.dispatch('fetchInfoAction');
-    }
+    await this.checkAvailabilityData();
     this.loading = false;
   },
 
@@ -143,6 +141,7 @@ export default Vue.extend({
       'getRecordByIdAction',
       'removeRecordAction',
       'updateRecordAction',
+      'infoUpdateAction',
     ]),
 
     onRemove() {
@@ -167,6 +166,18 @@ export default Vue.extend({
 
       await this.updateRecordAction(record);
       this.$router.push('/History');
+    },
+
+    async checkAvailabilityData() {
+      if (!this.$store.getters.categoriesGetter) {
+        await this.$store.dispatch('fetchCategoriesAction');
+      }
+      if (!this.$store.getters.recordsGetter) {
+        await this.$store.dispatch('fetchRecordsAction');
+      }
+      if (!this.$store.getters.uidGetter) {
+        await this.$store.dispatch('fetchInfoAction');
+      }
     },
   },
 });
@@ -198,6 +209,7 @@ interface CategoryItem {
           label="Категория"
           v-model="categoryTypeSelect"
           :items="categoriesAll"
+          :rules="[validationRules.validMustBeFilled]"
           item-text="title"
           item-value="id"
           prepend-icon="mdi-format-list-bulleted"
@@ -208,7 +220,7 @@ interface CategoryItem {
           label="Тип операции"
           v-model="categorySelect"
           :items="categoryItems"
-          :rules="categoryTypeRules"
+          :rules="[validationRules.validMustBeFilled]"
           item-text="text"
           item-value="type"
           item-color="color"
@@ -216,6 +228,7 @@ interface CategoryItem {
           required
         ></v-select>
 
+        <!-- date-picker -->
         <v-dialog
           ref="dialog"
           v-model="dateModal"
@@ -223,12 +236,13 @@ interface CategoryItem {
           persistent
           width="290px"
         >
-          <template v-slot:activator="{ on }">
+          <template v-slot:activator="{ on }" class="date-picker">
             <v-text-field
               label="Дата"
               v-model="date"
               prepend-icon="mdi-calendar"
               v-on="on"
+              readonly
             ></v-text-field>
           </template>
 
@@ -248,19 +262,33 @@ interface CategoryItem {
             </v-btn>
           </v-date-picker>
         </v-dialog>
+        <!-- /date-picker -->
 
         <v-text-field
           label="Счет"
           v-model="count"
-          :rules="countRules"
+          :rules="[
+            validationRules.validMustBeFilled,
+            validationRules.validOnlyNumbers,
+          ]"
           required
           prepend-icon="mdi-credit-card-multiple"
+          clearable
+        ></v-text-field>
+
+        <v-text-field
+          label="Метка"
+          v-model="marker"
+          prepend-icon="mdi-lead-pencil"
+          :rules="[validationRules.validOnlyLetters]"
+          clearable
         ></v-text-field>
 
         <v-text-field
           label="Описание"
           v-model="description"
           prepend-icon="mdi-lead-pencil"
+          clearable
         ></v-text-field>
       </v-container>
     </v-form>
@@ -341,6 +369,7 @@ interface CategoryItem {
   display: flex;
   justify-content: flex-end;
 }
+
 @media (max-width: 600px) {
   .truncate {
     white-space: nowrap;

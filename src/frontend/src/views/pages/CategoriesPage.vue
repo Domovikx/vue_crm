@@ -29,10 +29,7 @@ export default Vue.extend({
   }),
 
   async mounted() {
-    if (await !this.$store.getters.uidGetter) {
-      await this.$store.dispatch('fetchInfoAction');
-    }
-    await this.$store.dispatch('fetchCategoriesAction');
+    await this.checkAvailabilityData();
     this.loading = false;
   },
 
@@ -48,6 +45,15 @@ export default Vue.extend({
     categories() {
       const categories: any[] = this.categories;
       this.categoriesExist = categories.length > 0 ? true : false;
+    },
+  },
+
+  methods: {
+    async checkAvailabilityData() {
+      if (await !this.$store.getters.uidGetter) {
+        await this.$store.dispatch('fetchInfoAction');
+      }
+      await this.$store.dispatch('fetchCategoriesAction');
     },
   },
 });

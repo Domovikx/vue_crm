@@ -49,9 +49,7 @@ export default Vue.extend({
   },
 
   async mounted() {
-    if (await !this.$store.getters.uidGetter) {
-      await this.$store.dispatch('fetchInfoAction');
-    }
+    this.checkAvailabilityData();
   },
 
   watch: {
@@ -92,6 +90,12 @@ export default Vue.extend({
         this.$router.push('/');
       } catch (error) {
         throw error;
+      }
+    },
+
+    async checkAvailabilityData() {
+      if (await !this.$store.getters.uidGetter) {
+        await this.$store.dispatch('fetchInfoAction');
       }
     },
   },

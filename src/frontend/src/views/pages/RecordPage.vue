@@ -7,6 +7,8 @@ import LoaderComponent from '../../components/LoaderComponent.vue';
 import { Record } from '../../interfaces/Record.interface';
 import { Categories, UserCategory } from '../../interfaces/Category.interface';
 
+import validationRules from '../../utils/validationRules';
+
 export default Vue.extend({
   name: 'RecordPage',
   metaInfo: {
@@ -18,6 +20,8 @@ export default Vue.extend({
   },
 
   data: () => ({
+    validationRules,
+
     loading: true,
     categoriesExist: false,
 
@@ -27,15 +31,8 @@ export default Vue.extend({
 
     categoryTitle: 'categoryTitle',
     categoryType: 'outcome',
-    categoryTypeRules: [(v: string) => !!v || 'Это поле нужно заполнить'],
 
-    count: null,
-    countRules: [
-      (v: string) => !!v || 'Это поле нужно заполнить',
-      (v: string) =>
-        /^\d+(?:[\.,]\d+)?$/.test(v) ||
-        'Это поле должно содержать только числа',
-    ],
+    count: 0,
 
     marker: null,
 
@@ -59,14 +56,6 @@ export default Vue.extend({
   },
 
   async mounted() {
-    if (!this.$store.getters.uidGetter) {
-      await this.$store.dispatch('fetchInfoAction');
-    }
-
-    if (!this.categoriesGetter) {
-      await this.fetchCategoriesAction();
-    }
-
     if (this.categoriesGetter[0]) {
       this.categoriesExist = true;
       this.selectId = this.items[0].id;
@@ -95,7 +84,7 @@ export default Vue.extend({
         const record: Record = {
           categoryId: this.selectId,
           categoryTitle: this.categoryTitle,
-          count: this.count,
+          count: Number(String(this.count).replace(',', '.')),
           marker: this.marker,
           description: this.description || '',
           categoryType: this.categoryType,
@@ -120,6 +109,16 @@ export default Vue.extend({
         f.reset();
       } catch (error) {
         throw error;
+      }
+    },
+
+    async checkAvailabilityData() {
+      if (!this.$store.getters.uidGetter) {
+        await this.$store.dispatch('fetchInfoAction');
+      }
+
+      if (!this.categoriesGetter) {
+        await this.fetchCategoriesAction();
       }
     },
   },
@@ -152,28 +151,42 @@ export default Vue.extend({
           item-text="title"
           item-value="id"
           label="Выберите категорию"
+          :rules="[validationRules.validMustBeFilled]"
         ></v-select>
       </div>
 
       <v-radio-group
         v-model="categoryType"
         :mandatory="false"
-        :rules="categoryTypeRules"
+        :rules="[validationRules.validMustBeFilled]"
       >
         <v-radio label="Расход" value="outcome"></v-radio>
         <v-radio label="Доход" value="income"></v-radio>
       </v-radio-group>
 
       <v-text-field
-        v-model.trim="count"
+        v-model.number="count"
         label="Счет / Общая сумма"
-        :rules="countRules"
+        :rules="[
+          validationRules.validMustBeFilled,
+          validationRules.validOnlyNumbers,
+        ]"
         required
+        clearable
       ></v-text-field>
 
-      <v-text-field v-model.trim="marker" label="Метка"></v-text-field>
+      <v-text-field
+        v-model.trim="marker"
+        label="Метка"
+        :rules="[validationRules.validOnlyLetters]"
+        clearable
+      ></v-text-field>
 
-      <v-text-field v-model.trim="description" label="Описание"></v-text-field>
+      <v-text-field
+        v-model.trim="description"
+        label="Описание"
+        clearable
+      ></v-text-field>
 
       <v-card-actions>
         <v-btn block text @click.prevent="createRecord" :disabled="!valid">

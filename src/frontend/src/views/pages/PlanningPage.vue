@@ -22,10 +22,8 @@ export default Vue.extend({
   }),
 
   async mounted() {
-    if (await !this.$store.getters.uidGetter) {
-      await this.$store.dispatch('fetchInfoAction');
-    }
-    await this.getPlanningsAction();
+    await this.checkAvailabilityData();
+
     this.loading = false;
   },
 
@@ -56,6 +54,13 @@ export default Vue.extend({
 
   methods: {
     ...mapActions(['getPlanningsAction']),
+
+    async checkAvailabilityData() {
+      if (await !this.$store.getters.uidGetter) {
+        await this.$store.dispatch('fetchInfoAction');
+      }
+      await this.getPlanningsAction();
+    },
   },
 });
 </script>

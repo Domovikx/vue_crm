@@ -4,6 +4,7 @@ import Vue from 'vue';
 import { mapGetters, mapActions } from 'vuex';
 
 import LoaderComponent from '../../components/LoaderComponent.vue';
+import HistoryPeriodsComponent from '../components/history/HistoryPeriodsComponent.vue';
 
 import {
   HistoryByRecords,
@@ -20,6 +21,7 @@ export default Vue.extend({
 
   components: {
     LoaderComponent,
+    HistoryPeriodsComponent,
   },
 
   data: () => ({
@@ -83,12 +85,7 @@ export default Vue.extend({
   },
 
   async mounted() {
-    if (await !this.$store.getters.uidGetter) {
-      await this.$store.dispatch('fetchInfoAction');
-    }
-    if (!this.historyByRecordsGetter) {
-      await this.historyByRecordsAction();
-    }
+    await this.checkAvailabilityData();
     this.loading = false;
   },
 
@@ -116,6 +113,15 @@ export default Vue.extend({
           : 'teal lighten-5';
       return `cursor ${color}`;
     },
+
+    async checkAvailabilityData() {
+      if (await !this.$store.getters.uidGetter) {
+        await this.$store.dispatch('fetchInfoAction');
+      }
+      if (!this.historyByRecordsGetter) {
+        await this.historyByRecordsAction();
+      }
+    },
   },
 });
 </script>
@@ -138,7 +144,7 @@ export default Vue.extend({
       </v-col>
     </v-card-title>
 
-    <div>Итория за период</div>
+    <HistoryPeriodsComponent></HistoryPeriodsComponent>
 
     <v-data-table
       :headers="headers"
