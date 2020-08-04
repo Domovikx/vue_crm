@@ -9,6 +9,7 @@
     "s": "vue-cli-service serve"
   },
   "dependencies": {
+    "@types/chart.js": "^2.9.23",
     "@types/firebase": "^3.2.1",
     "chart.js": "^2.9.3",
     "core-js": "^3.6.5",

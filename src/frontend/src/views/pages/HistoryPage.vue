@@ -70,7 +70,7 @@ export default Vue.extend({
       if (!this.window.isMobile) {
         return [
           { text: 'Дата', value: 'date', align: 'center', sortable: true },
-          { text: 'Категория', value: 'category', sortable: true },
+          { text: 'Категория', value: 'category', sortable: false },
           { text: 'Тип', value: 'categoryType' },
           { text: 'Сумма', value: 'count' },
           { text: 'Метка', value: 'marker' },
@@ -109,7 +109,7 @@ export default Vue.extend({
 
     async removeRecord() {
       await this.removeRecordAction(this.record);
-      this.$router.push('/History');
+      await this.historyRecordsByPeriodAction();
     },
 
     customRowClass(item: HistoryRecord) {

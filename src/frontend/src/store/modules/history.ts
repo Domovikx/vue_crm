@@ -1,10 +1,6 @@
 import ActionContext from '@/interfaces/ActionContext.interface';
 import { Record, Records } from '@/interfaces/Record.interface';
-import { Categories, UserCategory } from '@/interfaces/Category.interface';
-import {
-  HistoryByRecords,
-  HistoryRecord,
-} from '@/interfaces/History.interface';
+import { HistoryByRecords } from '@/interfaces/History.interface';
 import firebase from 'firebase/app';
 
 const history = {

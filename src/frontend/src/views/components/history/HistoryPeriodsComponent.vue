@@ -38,15 +38,25 @@ export default Vue.extend({
 
   watch: {
     startDate() {
+      if (this.endDate < this.startDate) {
+        this.endDate = this.startDate;
+      }
+
       this.historyDatesMutation({
         startDate: this.startDate,
       });
+
       this.historyRecordsByPeriodAction();
     },
     endDate() {
+      if (this.endDate < this.startDate) {
+        this.endDate = this.startDate;
+      }
+
       this.historyDatesMutation({
         endDate: this.endDate,
       });
+
       this.historyRecordsByPeriodAction();
     },
   },
