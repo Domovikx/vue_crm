@@ -73,8 +73,6 @@ export default Vue.extend({
       Планирование
     </v-card-title>
 
-    <div>PlaningPageDetail</div>
-
     <div v-for="item in items" :key="item.categoryId">
       <v-card-actions>
         <h3>{{ item.categoryTitle }}</h3>

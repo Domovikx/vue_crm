@@ -5,6 +5,7 @@ import { mapGetters, mapActions } from 'vuex';
 
 import LoaderComponent from '../../components/LoaderComponent.vue';
 import HistoryPeriodsComponent from '../components/history/HistoryPeriodsComponent.vue';
+import HistoryChartComponent from '../components/history/HistoryChartComponent.vue';
 
 import {
   HistoryByRecords,
@@ -22,6 +23,7 @@ export default Vue.extend({
   components: {
     LoaderComponent,
     HistoryPeriodsComponent,
+    HistoryChartComponent,
   },
 
   data: () => ({
@@ -152,6 +154,7 @@ export default Vue.extend({
     </v-card-title>
 
     <HistoryPeriodsComponent />
+    <HistoryChartComponent :items="items" />
 
     <v-data-table
       :headers="headers"

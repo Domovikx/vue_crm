@@ -1,7 +1,7 @@
 <script lang="ts">
 import Vue from 'vue';
 
-import moment from 'moment';
+// import moment from 'moment';
 import momentFilter from '../../../filters/momentFilter';
 
 import { mapGetters, mapActions, mapMutations } from 'vuex';
