@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
 
 importScripts(
-  "/precache-manifest.f21fe1fb9ecddde57f5c4e25a6490e03.js"
+  "/precache-manifest.c04fa6909a5596f210697c48fe66b27a.js"
 );
 
 workbox.core.setCacheNameDetails({prefix: "shadow_accounting"});

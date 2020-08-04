@@ -95,7 +95,7 @@ export default Vue.extend({
           marker: this.marker,
           description: this.description || '',
           categoryType: this.categoryType,
-          date: new Date().toJSON(),
+          date: this.dateToday,
         };
 
         const lastRecord = await this.createRecordAction(record);

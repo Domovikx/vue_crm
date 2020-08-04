@@ -12,6 +12,8 @@
 Запуск:
 `npm run c` или `npm run client`
 
+- https://firebase.google.com/docs/cli#deployment
+
 ## Ресурсы:
 
 `BD : https://vuecrm200711.firebaseio.com/`  

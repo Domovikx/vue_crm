@@ -45,23 +45,23 @@ export default Vue.extend({
       },
     ],
 
-    categoryTitle: '',
-    categoryId: '',
-    categoryType: '',
     categoryTypeSelect: {} || '',
     categoryColor: '',
     categoryText: '',
 
-    date: '',
     dateModal: false,
 
-    count: null,
-
-    marker: '',
-
-    description: null,
-
     dialogToRemove: false,
+
+    form: {
+      categoryId: '',
+      categoryType: '',
+      categoryTitle: '',
+      count: '' || 0,
+      marker: '',
+      description: '',
+      date: '',
+    } as Record,
   }),
 
   async created() {
@@ -70,25 +70,7 @@ export default Vue.extend({
     this.id = this.$route.params.id;
     await this.getRecordByIdAction(this.id);
 
-    const categorySelect: CategoryItem | any = this.categoryItems.find(
-      (c: CategoryItem) => this.record.categoryType === c.type,
-    );
-    this.categorySelect = categorySelect;
-
-    this.date = await new Date(this.record.date).toISOString().substr(0, 10);
-    this.count = this.record.count;
-    this.description = this.record.description;
-
-    this.categoryTitle = this.record.categoryTitle;
-    this.categoryId = this.record.categoryId;
-    this.categoryType = categorySelect.type;
-    this.categoryColor = categorySelect.color;
-    this.categoryText = categorySelect.text;
-
-    this.categoryTypeSelect =
-      this.categoriesAll.find(
-        (c: UserCategory) => c.id === this.record.categoryId,
-      ) || '';
+    this.setCategoryData();
   },
 
   async mounted() {
@@ -118,7 +100,7 @@ export default Vue.extend({
         (c: CategoryItem) => c.type === type,
       );
       if (select) {
-        this.categoryType = select.type;
+        this.form.categoryType = select.type;
         this.categoryColor = select.color;
         this.categoryText = select.text;
       }
@@ -130,8 +112,8 @@ export default Vue.extend({
         (c: UserCategory) => c.id === id,
       );
       if (select) {
-        this.categoryTitle = select.title;
-        this.categoryId = select.id;
+        this.form.categoryTitle = select.title;
+        this.form.categoryId = select.id;
       }
     },
   },
@@ -156,16 +138,36 @@ export default Vue.extend({
     async onSave() {
       const record: Record = {
         ...this.record,
-        categoryId: this.categoryId,
-        categoryTitle: this.categoryTitle,
-        categoryType: this.categoryType,
-        date: this.date,
-        count: this.count,
-        description: this.description,
+        ...this.form,
       };
 
       await this.updateRecordAction(record);
       this.$router.push('/History');
+    },
+
+    async setCategoryData() {
+      const categorySelect: CategoryItem | any = this.categoryItems.find(
+        (c: CategoryItem) => this.record.categoryType === c.type,
+      );
+      this.categorySelect = categorySelect;
+
+      this.form.date = await new Date(this.record.date)
+        .toISOString()
+        .substr(0, 10);
+      this.form.count = this.record.count;
+      this.form.marker = this.record.marker;
+      this.form.description = this.record.description;
+      this.form.categoryTitle = this.record.categoryTitle;
+      this.form.categoryId = this.record.categoryId;
+      this.form.categoryType = categorySelect.type;
+
+      this.categoryColor = categorySelect.color;
+      this.categoryText = categorySelect.text;
+
+      this.categoryTypeSelect =
+        this.categoriesAll.find(
+          (c: UserCategory) => c.id === this.record.categoryId,
+        ) || '';
     },
 
     async checkAvailabilityData() {
@@ -194,9 +196,9 @@ interface CategoryItem {
 
   <v-card v-else-if="!loading">
     <v-card-title :class="categoryColor">
-      <span :class="window.isMobile ? 'truncate' : ''"
-        >{{ categoryTitle }} - {{ categoryText }}</span
-      >
+      <span :class="window.isMobile ? 'truncate' : ''">
+        {{ form.categoryTitle }} - {{ categoryText }}
+      </span>
       <v-spacer></v-spacer>
       <v-btn icon to="/History">
         <v-icon> mdi-close-circle </v-icon>
@@ -232,14 +234,14 @@ interface CategoryItem {
         <v-dialog
           ref="dialog"
           v-model="dateModal"
-          :return-value.sync="date"
+          :return-value.sync="form.date"
           persistent
           width="290px"
         >
           <template v-slot:activator="{ on }" class="date-picker">
             <v-text-field
               label="Дата"
-              v-model="date"
+              v-model="form.date"
               prepend-icon="mdi-calendar"
               v-on="on"
               readonly
@@ -247,7 +249,7 @@ interface CategoryItem {
           </template>
 
           <v-date-picker
-            v-model="date"
+            v-model="form.date"
             scrollable
             :locale="locale"
             first-day-of-week="1"
@@ -257,7 +259,7 @@ interface CategoryItem {
               Cancel
             </v-btn>
 
-            <v-btn text color="primary" @click="$refs.dialog.save(date)">
+            <v-btn text color="primary" @click="$refs.dialog.save(form.date)">
               OK
             </v-btn>
           </v-date-picker>
@@ -266,7 +268,7 @@ interface CategoryItem {
 
         <v-text-field
           label="Счет"
-          v-model="count"
+          v-model="form.count"
           :rules="[
             validationRules.validMustBeFilled,
             validationRules.validOnlyNumbers,
@@ -278,7 +280,7 @@ interface CategoryItem {
 
         <v-text-field
           label="Метка"
-          v-model="marker"
+          v-model="form.marker"
           prepend-icon="mdi-lead-pencil"
           :rules="[validationRules.validOnlyLetters]"
           clearable
@@ -286,7 +288,7 @@ interface CategoryItem {
 
         <v-text-field
           label="Описание"
-          v-model="description"
+          v-model="form.description"
           prepend-icon="mdi-lead-pencil"
           clearable
         ></v-text-field>

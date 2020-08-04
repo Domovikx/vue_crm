@@ -37,6 +37,8 @@ export default Vue.extend({
 
     record: null,
     dialogToRemove: false,
+
+    items: [] as Records,
   }),
 
   computed: {
@@ -46,6 +48,8 @@ export default Vue.extend({
       'currencyBaseGetter',
       'recordsGetter',
       'windowGetter',
+      'historyGetPeriods',
+      'historyRecordsByPeriodGetter',
     ]),
 
     bill: function (): string {
@@ -54,10 +58,6 @@ export default Vue.extend({
 
     currencyBase: function (): string {
       return this.currencyBaseGetter;
-    },
-
-    items: function (): Records {
-      return this.recordsGetter;
     },
 
     window(): ThisWindow {
@@ -90,7 +90,11 @@ export default Vue.extend({
   },
 
   methods: {
-    ...mapActions(['historyByRecordsAction', 'removeRecordAction']),
+    ...mapActions([
+      'historyByRecordsAction',
+      'removeRecordAction',
+      'historyRecordsByPeriodAction',
+    ]),
 
     onEdit(item: HistoryRecord) {
       this.$router.push({ name: 'Detail', params: { id: item.id } });
@@ -111,16 +115,19 @@ export default Vue.extend({
         item.categoryType === 'outcome'
           ? 'deep-orange lighten-5'
           : 'teal lighten-5';
-      return `cursor ${color}`;
+      return `${color}`;
     },
 
     async checkAvailabilityData() {
-      if (await !this.$store.getters.uidGetter) {
+      if (!this.$store.getters.uidGetter) {
         await this.$store.dispatch('fetchInfoAction');
       }
-      if (!this.historyByRecordsGetter) {
-        await this.historyByRecordsAction();
-      }
+    },
+  },
+
+  watch: {
+    historyRecordsByPeriodGetter(): void {
+      this.items = this.historyRecordsByPeriodGetter;
     },
   },
 });
@@ -144,7 +151,7 @@ export default Vue.extend({
       </v-col>
     </v-card-title>
 
-    <HistoryPeriodsComponent></HistoryPeriodsComponent>
+    <HistoryPeriodsComponent />
 
     <v-data-table
       :headers="headers"
@@ -152,12 +159,15 @@ export default Vue.extend({
       :search="search"
       :sort-by="['date']"
       :sort-desc="[true]"
-      multi-sort
     >
       <template v-slot:item="row">
-        <tr :class="customRowClass(row.item)" @click="onEdit(row.item)">
+        <tr
+          :class="customRowClass(row.item)"
+          style="cursor: pointer;"
+          @click="onEdit(row.item)"
+        >
           <td v-if="!window.isMobile">
-            {{ row.item.date | dateFilter('DD-MM-YY') }}
+            {{ row.item.date | momentFilter('YYYY-MM-DD') }}
           </td>
 
           <td v-if="!window.isMobile">
@@ -188,7 +198,7 @@ export default Vue.extend({
             </v-tooltip>
           </td>
 
-          <td class="td-flex">
+          <td :class="`d-flex justify-center align-center`">
             <v-btn icon @click.stop="onRemove(row.item)">
               <v-icon dark>mdi-delete</v-icon>
             </v-btn>
@@ -229,12 +239,6 @@ export default Vue.extend({
 </template>
 
 <style lang="scss" scoped>
-.td-flex {
-  display: flex;
-  align-items: center;
-  justify-content: space-evenly;
-}
-
 .cursor {
   cursor: pointer;
 }
