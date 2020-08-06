@@ -22,10 +22,8 @@ export default Vue.extend({
   }),
 
   async mounted() {
-    if (await !this.$store.getters.uidGetter) {
-      await this.$store.dispatch('fetchInfoAction');
-    }
-    await this.getPlanningsAction();
+    await this.checkAvailabilityData();
+
     this.loading = false;
   },
 
@@ -56,6 +54,13 @@ export default Vue.extend({
 
   methods: {
     ...mapActions(['getPlanningsAction']),
+
+    async checkAvailabilityData() {
+      if (await !this.$store.getters.uidGetter) {
+        await this.$store.dispatch('fetchInfoAction');
+      }
+      await this.getPlanningsAction();
+    },
   },
 });
 </script>
@@ -66,23 +71,67 @@ export default Vue.extend({
   <div v-else-if="!loading">
     <v-card-title>
       Планирование
-      <v-spacer></v-spacer>
-      {{ bill | currencyFilter(currencyBase) }}
     </v-card-title>
 
     <div v-for="item in items" :key="item.categoryId">
       <v-card-actions>
         <h3>{{ item.categoryTitle }}</h3>
         <v-spacer></v-spacer>
-        {{ item.categoryLimit | currencyFilter(currencyBase) }}
+        <strong>
+          {{
+            item.categoryLimit
+              | currencyFilter({
+                maximumFractionDigits: 2,
+              })
+          }}</strong
+        >
       </v-card-actions>
 
+      <!-- expensePercent -->
       <v-progress-linear
         :value="item.expensePercent"
         height="25"
-        color="blue-grey lighten-3"
+        :color="item.rate > 0 ? 'teal lighten-4' : 'deep-orange lighten-4'"
       >
-        <strong>{{ item.rate }} | {{ item.expensePercent }}% </strong>
+        <strong>
+          {{
+            item.rate
+              | currencyFilter({
+                maximumFractionDigits: 2,
+              })
+          }}
+          <span v-if="item.categoryLimit">| {{ item.expensePercent }}%</span>
+        </strong>
+      </v-progress-linear>
+
+      <!-- percentIncome -->
+      <v-progress-linear
+        v-if="item.percentIncome && item.percentOutcome"
+        :value="item.percentIncome"
+        height="25"
+        color="teal lighten-4"
+      >
+        {{
+          item.typeIncome
+            | currencyFilter({
+              maximumFractionDigits: 2,
+            })
+        }}
+      </v-progress-linear>
+
+      <!-- percentOutcome -->
+      <v-progress-linear
+        v-if="item.percentIncome && item.percentOutcome"
+        :value="item.percentOutcome"
+        height="25"
+        color="deep-orange lighten-4"
+      >
+        -{{
+          item.typeOutcome
+            | currencyFilter({
+              maximumFractionDigits: 2,
+            })
+        }}
       </v-progress-linear>
     </div>
   </div>

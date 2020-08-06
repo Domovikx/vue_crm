@@ -8,6 +8,8 @@ export interface PlanningByCategory {
   rate?: number | any;
   bill?: number | any;
   expensePercent?: number | any;
+  percentIncome: number | any;
+  percentOutcome: number | any;
 }
 
 export interface PlanningsByCategories extends Array<PlanningByCategory> {}

@@ -6,6 +6,9 @@ import LoaderComponent from '../../components/LoaderComponent.vue';
 
 import { Record } from '../../interfaces/Record.interface';
 import { Categories, UserCategory } from '../../interfaces/Category.interface';
+import { ThisWindow } from '../../interfaces/ThisWindow.interface';
+
+import validationRules from '../../utils/validationRules';
 
 export default Vue.extend({
   name: 'DetailPage',
@@ -18,13 +21,17 @@ export default Vue.extend({
   },
 
   data: () => ({
+    validationRules,
+
     loading: true,
     valid: false,
     id: null || '',
 
     locale: 'ru-RU',
 
-    categorySelect: {},
+    categorySelect: {
+      type: 'outcome',
+    },
     categoryItems: [
       {
         type: 'outcome',
@@ -37,65 +44,42 @@ export default Vue.extend({
         color: 'teal lighten-4',
       },
     ],
-    categoryTypeRules: [(v: string) => !!v || 'Это поле нужно заполнить'],
 
-    categoryTitle: '',
-    categoryId: '',
-    categoryType: '',
     categoryTypeSelect: {} || '',
     categoryColor: '',
     categoryText: '',
 
-    date: '',
     dateModal: false,
-    dateRules: [(v: string) => !!v || 'Это поле нужно заполнить'],
-
-    count: null,
-    countRules: [
-      (v: string) => !!v || 'Это поле нужно заполнить',
-      (v: string) =>
-        /^\d+(?:[\.,]\d+)?$/.test(v) ||
-        'Это поле должно содержать только числа',
-    ],
-
-    description: null,
 
     dialogToRemove: false,
+
+    form: {
+      categoryId: '',
+      categoryType: '',
+      categoryTitle: '',
+      count: '' || 0,
+      marker: '',
+      description: '',
+      date: '',
+    } as Record,
   }),
 
   async created() {
+    await this.checkAvailabilityData();
+
     this.id = this.$route.params.id;
     await this.getRecordByIdAction(this.id);
 
-    const categorySelect: CategoryItem | any = this.categoryItems.find(
-      (c: CategoryItem) => this.record.categoryType === c.type,
-    );
-    this.categorySelect = categorySelect;
-    this.date = new Date(this.record.date).toISOString().substr(0, 10);
-    this.count = this.record.count;
-    this.description = this.record.description;
-
-    this.categoryTitle = this.record.categoryTitle;
-    this.categoryId = this.record.categoryId;
-    this.categoryType = categorySelect.type;
-    this.categoryColor = categorySelect.color;
-    this.categoryText = categorySelect.text;
-
-    this.categoryTypeSelect =
-      this.categoriesAll.find(
-        (c: UserCategory) => c.id === this.record.categoryId,
-      ) || '';
+    this.setCategoryData();
   },
 
   async mounted() {
-    if (await !this.$store.getters.uidGetter) {
-      await this.$store.dispatch('fetchInfoAction');
-    }
+    await this.checkAvailabilityData();
     this.loading = false;
   },
 
   computed: {
-    ...mapGetters(['recordByIdGetter', 'categoriesGetter']),
+    ...mapGetters(['recordByIdGetter', 'categoriesGetter', 'windowGetter']),
 
     record(): Record {
       return this.recordByIdGetter;
@@ -104,6 +88,10 @@ export default Vue.extend({
     categoriesAll(): Categories {
       return this.categoriesGetter;
     },
+
+    window(): ThisWindow {
+      return this.windowGetter;
+    },
   },
 
   watch: {
@@ -111,9 +99,11 @@ export default Vue.extend({
       const select: CategoryItem | any = this.categoryItems.find(
         (c: CategoryItem) => c.type === type,
       );
-      this.categoryType = select.type;
-      this.categoryColor = select.color;
-      this.categoryText = select.text;
+      if (select) {
+        this.form.categoryType = select.type;
+        this.categoryColor = select.color;
+        this.categoryText = select.text;
+      }
     },
 
     categoryTypeSelect(id) {
@@ -121,8 +111,10 @@ export default Vue.extend({
       const select: UserCategory | any = categoriesAll.find(
         (c: UserCategory) => c.id === id,
       );
-      this.categoryTitle = select.title;
-      this.categoryId = select.id;
+      if (select) {
+        this.form.categoryTitle = select.title;
+        this.form.categoryId = select.id;
+      }
     },
   },
 
@@ -131,6 +123,7 @@ export default Vue.extend({
       'getRecordByIdAction',
       'removeRecordAction',
       'updateRecordAction',
+      'infoUpdateAction',
     ]),
 
     onRemove() {
@@ -145,16 +138,48 @@ export default Vue.extend({
     async onSave() {
       const record: Record = {
         ...this.record,
-        categoryId: this.categoryId,
-        categoryTitle: this.categoryTitle,
-        categoryType: this.categoryType,
-        date: this.date,
-        count: this.count,
-        description: this.description,
+        ...this.form,
       };
 
       await this.updateRecordAction(record);
       this.$router.push('/History');
+    },
+
+    async setCategoryData() {
+      const categorySelect: CategoryItem | any = this.categoryItems.find(
+        (c: CategoryItem) => this.record.categoryType === c.type,
+      );
+      this.categorySelect = categorySelect;
+
+      this.form.date = await new Date(this.record.date)
+        .toISOString()
+        .substr(0, 10);
+      this.form.count = this.record.count;
+      this.form.marker = this.record.marker;
+      this.form.description = this.record.description;
+      this.form.categoryTitle = this.record.categoryTitle;
+      this.form.categoryId = this.record.categoryId;
+      this.form.categoryType = categorySelect.type;
+
+      this.categoryColor = categorySelect.color;
+      this.categoryText = categorySelect.text;
+
+      this.categoryTypeSelect =
+        this.categoriesAll.find(
+          (c: UserCategory) => c.id === this.record.categoryId,
+        ) || '';
+    },
+
+    async checkAvailabilityData() {
+      if (!this.$store.getters.categoriesGetter) {
+        await this.$store.dispatch('fetchCategoriesAction');
+      }
+      if (!this.$store.getters.recordsGetter) {
+        await this.$store.dispatch('fetchRecordsAction');
+      }
+      if (!this.$store.getters.uidGetter) {
+        await this.$store.dispatch('fetchInfoAction');
+      }
     },
   },
 });
@@ -171,12 +196,12 @@ interface CategoryItem {
 
   <v-card v-else-if="!loading">
     <v-card-title :class="categoryColor">
-      {{ categoryTitle }} - {{ categoryText }}
+      <span :class="window.isMobile ? 'truncate' : ''">
+        {{ form.categoryTitle }} - {{ categoryText }}
+      </span>
       <v-spacer></v-spacer>
       <v-btn icon to="/History">
-        <v-icon dark>
-          mdi-close-circle
-        </v-icon>
+        <v-icon> mdi-close-circle </v-icon>
       </v-btn>
     </v-card-title>
 
@@ -186,6 +211,7 @@ interface CategoryItem {
           label="Категория"
           v-model="categoryTypeSelect"
           :items="categoriesAll"
+          :rules="[validationRules.validMustBeFilled]"
           item-text="title"
           item-value="id"
           prepend-icon="mdi-format-list-bulleted"
@@ -196,7 +222,7 @@ interface CategoryItem {
           label="Тип операции"
           v-model="categorySelect"
           :items="categoryItems"
-          :rules="categoryTypeRules"
+          :rules="[validationRules.validMustBeFilled]"
           item-text="text"
           item-value="type"
           item-color="color"
@@ -204,24 +230,26 @@ interface CategoryItem {
           required
         ></v-select>
 
+        <!-- date-picker -->
         <v-dialog
           ref="dialog"
           v-model="dateModal"
-          :return-value.sync="date"
+          :return-value.sync="form.date"
           persistent
           width="290px"
         >
-          <template v-slot:activator="{ on }">
+          <template v-slot:activator="{ on }" class="date-picker">
             <v-text-field
               label="Дата"
-              v-model="date"
+              v-model="form.date"
               prepend-icon="mdi-calendar"
               v-on="on"
+              readonly
             ></v-text-field>
           </template>
 
           <v-date-picker
-            v-model="date"
+            v-model="form.date"
             scrollable
             :locale="locale"
             first-day-of-week="1"
@@ -231,44 +259,79 @@ interface CategoryItem {
               Cancel
             </v-btn>
 
-            <v-btn text color="primary" @click="$refs.dialog.save(date)">
+            <v-btn text color="primary" @click="$refs.dialog.save(form.date)">
               OK
             </v-btn>
           </v-date-picker>
         </v-dialog>
+        <!-- /date-picker -->
 
         <v-text-field
           label="Счет"
-          v-model="count"
-          :rules="countRules"
+          v-model="form.count"
+          :rules="[
+            validationRules.validMustBeFilled,
+            validationRules.validOnlyNumbers,
+          ]"
           required
           prepend-icon="mdi-credit-card-multiple"
+          clearable
+        ></v-text-field>
+
+        <v-text-field
+          label="Метка"
+          v-model="form.marker"
+          prepend-icon="mdi-lead-pencil"
+          :rules="[validationRules.validOnlyLetters]"
+          clearable
         ></v-text-field>
 
         <v-text-field
           label="Описание"
-          v-model="description"
+          v-model="form.description"
           prepend-icon="mdi-lead-pencil"
+          clearable
         ></v-text-field>
       </v-container>
     </v-form>
 
-    <v-card-actions>
-      <v-spacer></v-spacer>
-
-      <v-btn text @click="onRemove">
+    <v-card-actions class="v-card-actions">
+      <!-- btn remove -->
+      <v-btn v-if="window.isMobile" icon large @click="onRemove">
+        <v-icon>mdi-table-row-remove</v-icon>
+      </v-btn>
+      <v-btn v-else-if="!window.isMobile" text @click="onRemove">
         <v-icon left>mdi-table-row-remove</v-icon>
         удалить
       </v-btn>
 
-      <v-btn text @click="onSave" :disabled="!valid">
-        <v-icon left>mdi-refresh</v-icon>
-        сохранить
+      <!-- btn to history -->
+      <v-btn v-if="window.isMobile" icon large to="/History">
+        <v-icon>mdi-chart-line</v-icon>
       </v-btn>
-
-      <v-btn text to="/History">
+      <v-btn v-else-if="!window.isMobile" text to="/History">
         <v-icon left>mdi-chart-line</v-icon>
         История
+      </v-btn>
+
+      <!-- btn save -->
+      <v-btn
+        v-if="window.isMobile"
+        icon
+        large
+        @click="onSave"
+        :disabled="!valid"
+      >
+        <v-icon>mdi-content-save</v-icon>
+      </v-btn>
+      <v-btn
+        v-else-if="!window.isMobile"
+        text
+        @click="onSave"
+        :disabled="!valid"
+      >
+        <v-icon left>mdi-content-save</v-icon>
+        сохранить
       </v-btn>
     </v-card-actions>
 
@@ -302,3 +365,23 @@ interface CategoryItem {
     </v-dialog>
   </v-card>
 </template>
+
+<style lang="scss" scoped>
+.v-card-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+@media (max-width: 600px) {
+  .truncate {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 200px;
+  }
+  .v-card-actions {
+    display: flex;
+    justify-content: space-evenly;
+  }
+}
+</style>

@@ -132,74 +132,76 @@ export default Vue.extend({
 <template>
   <LoaderComponent v-if="loading" />
 
-  <div class="col s12 m6" v-else-if="!loading">
-    <h3>Редактировать</h3>
+  <v-col cols="12" sm="12" md="6" lg="3" xl="3" v-else-if="!loading">
+    <v-card color="backgroundMain" outlined>
+      <v-card-title>Редактировать категорию</v-card-title>
 
-    <v-form ref="form" v-model="valid">
-      <v-select
-        v-model="select"
-        :items="items"
-        item-text="title"
-        item-value="id"
-        label="Выберите категорию"
-        required
-      ></v-select>
+      <v-form ref="form" v-model="valid">
+        <v-select
+          v-model="select"
+          :items="items"
+          item-text="title"
+          item-value="id"
+          label="Выберите категорию"
+          required
+        ></v-select>
 
-      <v-text-field
-        v-model="title"
-        label="Название"
-        required
-        :rules="titleRules"
-      ></v-text-field>
+        <v-text-field
+          v-model="title"
+          label="Название"
+          required
+          :rules="titleRules"
+        ></v-text-field>
 
-      <v-text-field
-        v-model="limit"
-        label="Лимит"
-        required
-        :rules="limitRules"
-      ></v-text-field>
+        <v-text-field
+          v-model="limit"
+          label="Лимит"
+          required
+          :rules="limitRules"
+        ></v-text-field>
 
-      <v-card-actions class="justify-center">
-        <v-btn text :disabled="!valid" @click="updateCategories">
-          <v-icon left>mdi-refresh</v-icon>
-          Обновить
-        </v-btn>
-        <v-btn text :disabled="!valid" @click="onRemove">
-          <v-icon left>mdi-table-row-remove</v-icon>
-          Удалить
-        </v-btn>
-      </v-card-actions>
-    </v-form>
-
-    <!-- dialogToRemove -->
-    <v-dialog v-model="dialogToRemove" max-width="290">
-      <v-card>
-        <v-card-title class="headline">
-          Удалить запись?
-        </v-card-title>
-
-        <v-card-text>
-          Внимание. Удаление записи необратимо. Подтвердите удаление записи.
-        </v-card-text>
-
-        <v-card-actions>
-          <v-spacer></v-spacer>
-
-          <v-btn color="green darken-1" text @click="dialogToRemove = false">
-            Отмена
+        <v-card-actions class="justify-center">
+          <v-btn text :disabled="!valid" @click="updateCategories">
+            <v-icon left>mdi-refresh</v-icon>
+            Обновить
           </v-btn>
-
-          <v-btn
-            color="green darken-1"
-            text
-            @click="(dialogToRemove = false), removeCategory()"
-          >
+          <v-btn text :disabled="!valid" @click="onRemove">
+            <v-icon left>mdi-table-row-remove</v-icon>
             Удалить
           </v-btn>
         </v-card-actions>
-      </v-card>
-    </v-dialog>
-  </div>
+      </v-form>
+
+      <!-- dialogToRemove -->
+      <v-dialog v-model="dialogToRemove" max-width="290">
+        <v-card>
+          <v-card-title class="headline">
+            Удалить запись?
+          </v-card-title>
+
+          <v-card-text>
+            Внимание. Удаление записи необратимо. Подтвердите удаление записи.
+          </v-card-text>
+
+          <v-card-actions>
+            <v-spacer></v-spacer>
+
+            <v-btn color="green darken-1" text @click="dialogToRemove = false">
+              Отмена
+            </v-btn>
+
+            <v-btn
+              color="green darken-1"
+              text
+              @click="(dialogToRemove = false), removeCategory()"
+            >
+              Удалить
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+    </v-card>
+  </v-col>
 </template>
 
 <style lang="scss" scoped></style>

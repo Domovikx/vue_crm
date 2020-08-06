@@ -4,11 +4,15 @@ import Vue from 'vue';
 import { mapGetters, mapActions } from 'vuex';
 
 import LoaderComponent from '../../components/LoaderComponent.vue';
+import HistoryPeriodsComponent from '../components/history/HistoryPeriodsComponent.vue';
+import HistoryChartComponent from '../components/history/HistoryChartComponent.vue';
 
 import {
   HistoryByRecords,
   HistoryRecord,
 } from '../../interfaces/History.interface';
+import { Records } from '../../interfaces/Record.interface';
+import { ThisWindow } from '../../interfaces/ThisWindow.interface';
 
 export default Vue.extend({
   name: 'HistoryPage',
@@ -18,6 +22,8 @@ export default Vue.extend({
 
   components: {
     LoaderComponent,
+    HistoryPeriodsComponent,
+    HistoryChartComponent,
   },
 
   data: () => ({
@@ -25,17 +31,16 @@ export default Vue.extend({
 
     search: '',
 
-    headers: [
-      { text: 'Дата', value: 'date', align: 'center', sortable: true },
-      { text: 'Категория', value: 'category', sortable: true },
-      { text: 'Тип', value: 'categoryType' },
-      { text: 'Сумма', value: 'count' },
-      { text: 'Описание', value: 'description' },
-      { text: 'Действие', value: 'id', sortable: false, align: 'center' },
-    ],
+    currencyOptions: {
+      style: 'currency',
+      currency: 'BYN',
+      maximumFractionDigits: 2,
+    },
 
     record: null,
     dialogToRemove: false,
+
+    items: [] as Records,
   }),
 
   computed: {
@@ -43,6 +48,10 @@ export default Vue.extend({
       'historyByRecordsGetter',
       'infoBillGetter',
       'currencyBaseGetter',
+      'recordsGetter',
+      'windowGetter',
+      'historyGetPeriods',
+      'historyRecordsByPeriodGetter',
     ]),
 
     bill: function (): string {
@@ -53,23 +62,41 @@ export default Vue.extend({
       return this.currencyBaseGetter;
     },
 
-    items: function (): HistoryByRecords {
-      return this.historyByRecordsGetter;
+    window(): ThisWindow {
+      return this.windowGetter;
+    },
+
+    headers() {
+      if (!this.window.isMobile) {
+        return [
+          { text: 'Дата', value: 'date', align: 'center', sortable: true },
+          { text: 'Категория', value: 'category', sortable: false },
+          { text: 'Тип', value: 'categoryType' },
+          { text: 'Сумма', value: 'count' },
+          { text: 'Метка', value: 'marker' },
+          { text: 'Действие', value: 'id', sortable: false, align: 'center' },
+        ];
+      } else if (this.window.isMobile) {
+        return [
+          { text: 'Сумма', value: 'count' },
+          { text: 'Метка', value: 'marker' },
+          { text: 'Действие', value: 'id', sortable: false, align: 'center' },
+        ];
+      }
     },
   },
 
   async mounted() {
-    if (await !this.$store.getters.uidGetter) {
-      await this.$store.dispatch('fetchInfoAction');
-    }
-    if (!this.historyByRecordsGetter) {
-      await this.historyByRecordsAction();
-    }
+    await this.checkAvailabilityData();
     this.loading = false;
   },
 
   methods: {
-    ...mapActions(['historyByRecordsAction', 'removeRecordAction']),
+    ...mapActions([
+      'historyByRecordsAction',
+      'removeRecordAction',
+      'historyRecordsByPeriodAction',
+    ]),
 
     onEdit(item: HistoryRecord) {
       this.$router.push({ name: 'Detail', params: { id: item.id } });
@@ -82,7 +109,7 @@ export default Vue.extend({
 
     async removeRecord() {
       await this.removeRecordAction(this.record);
-      this.$router.push('/History');
+      await this.historyRecordsByPeriodAction();
     },
 
     customRowClass(item: HistoryRecord) {
@@ -90,7 +117,19 @@ export default Vue.extend({
         item.categoryType === 'outcome'
           ? 'deep-orange lighten-5'
           : 'teal lighten-5';
-      return `cursor ${color}`;
+      return `${color}`;
+    },
+
+    async checkAvailabilityData() {
+      if (!this.$store.getters.uidGetter) {
+        await this.$store.dispatch('fetchInfoAction');
+      }
+    },
+  },
+
+  watch: {
+    historyRecordsByPeriodGetter(): void {
+      this.items = this.historyRecordsByPeriodGetter;
     },
   },
 });
@@ -99,18 +138,23 @@ export default Vue.extend({
 <template>
   <LoaderComponent v-if="loading" />
 
-  <v-card v-else-if="!loading">
+  <v-card v-else-if="!loading" color="backgroundMain" outlined>
     <v-card-title>
-      История ({{ bill | currencyFilter(currencyBase) }})
+      История
       <v-spacer></v-spacer>
-      <v-text-field
-        v-model="search"
-        append-icon="mdi-magnify"
-        label="Найти"
-        single-line
-        hide-details
-      ></v-text-field>
+      <v-col cols="12" sm="8" md="6">
+        <v-text-field
+          v-model="search"
+          append-icon="mdi-magnify"
+          label="Найти"
+          single-line
+          hide-details
+        ></v-text-field>
+      </v-col>
     </v-card-title>
+
+    <HistoryPeriodsComponent />
+    <HistoryChartComponent :items="items" />
 
     <v-data-table
       :headers="headers"
@@ -118,34 +162,46 @@ export default Vue.extend({
       :search="search"
       :sort-by="['date']"
       :sort-desc="[true]"
-      multi-sort
     >
       <template v-slot:item="row">
-        <tr :class="customRowClass(row.item)" @click="onEdit(row.item)">
-          <td>{{ row.item.date | dateFilter('DD-MM-YY') }}</td>
+        <tr
+          :class="customRowClass(row.item)"
+          style="cursor: pointer;"
+          @click="onEdit(row.item)"
+        >
+          <td v-if="!window.isMobile">
+            {{ row.item.date | momentFilter('YYYY-MM-DD') }}
+          </td>
 
-          <td>
+          <td v-if="!window.isMobile">
             {{ row.item.categoryTitle }}
           </td>
 
-          <td>
+          <td v-if="!window.isMobile">
             {{
               row.item.categoryType | categoryTypeFilter(row.item.categoryType)
             }}
           </td>
 
-          <td>{{ row.item.count | currencyFilter('BYN', 3) }}</td>
+          <td>
+            {{
+              row.item.count
+                | currencyFilter({
+                  maximumFractionDigits: 2,
+                })
+            }}
+          </td>
 
-          <td class="truncate">
+          <td>
             <v-tooltip bottom>
               <template v-slot:activator="{ on, attrs }">
-                <span v-bind="attrs" v-on="on">{{ row.item.description }}</span>
+                <span v-bind="attrs" v-on="on">{{ row.item.marker }}</span>
               </template>
-              <span>{{ row.item.description }}</span>
+              <span>{{ row.item.description || row.item.marker }}</span>
             </v-tooltip>
           </td>
 
-          <td class="td-flex">
+          <td :class="`d-flex justify-center align-center`">
             <v-btn icon @click.stop="onRemove(row.item)">
               <v-icon dark>mdi-delete</v-icon>
             </v-btn>
@@ -186,19 +242,6 @@ export default Vue.extend({
 </template>
 
 <style lang="scss" scoped>
-.td-flex {
-  display: flex;
-  align-items: center;
-  justify-content: space-evenly;
-}
-
-.truncate {
-  max-width: 1px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
 .cursor {
   cursor: pointer;
 }

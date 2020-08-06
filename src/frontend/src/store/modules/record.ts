@@ -28,10 +28,14 @@ const record = {
       try {
         const uid: string = getters.uidGetter;
 
-        await firebase.database().ref(`/users/${uid}/records`).push(record);
+        const id = (
+          await firebase.database().ref(`/users/${uid}/records`).push(record)
+        ).key;
 
         await dispatch('fetchRecordsAction');
         await dispatch('historyByRecordsAction');
+
+        return { ...record, id };
       } catch (error) {
         throw error;
       }
@@ -94,7 +98,6 @@ const record = {
     async getRecordByIdAction({ getters, commit }: ActionContext, id: string) {
       const records: [Record] = getters.recordsGetter;
       const recordById: Record | any = records.find((r: Record) => r.id === id);
-
       await commit('recordByIdMutation', recordById);
     },
 
@@ -176,7 +179,7 @@ const record = {
           .update(currentRecord);
 
         // Updating the bill
-        await dispatch('infoUpdateBillAction', { bill });
+        await dispatch('infoUpdateAction', { bill });
         await dispatch('fetchRecordsAction');
         await dispatch('historyByRecordsAction');
       } catch (error) {

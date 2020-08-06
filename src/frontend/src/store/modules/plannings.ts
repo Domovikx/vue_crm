@@ -38,6 +38,8 @@ const plannings = {
               bill: Number(bill),
               rate: 0,
               expensePercent: 0,
+              percentIncome: 0,
+              percentOutcome: 0,
             };
 
             records.forEach((record: Record) => {
@@ -57,9 +59,24 @@ const plannings = {
                   planningByCategory.typeIncome -
                   planningByCategory.typeOutcome;
 
-                planningByCategory.expensePercent =
+                planningByCategory.expensePercent = Math.abs(
                   Math.round(
-                    ((planningByCategory.rate * 100 * -1) /
+                    ((planningByCategory.rate * 100) /
+                      planningByCategory.categoryLimit) *
+                      100,
+                  ) / 100,
+                );
+
+                planningByCategory.percentIncome =
+                  Math.round(
+                    ((planningByCategory.typeIncome * 100) /
+                      planningByCategory.categoryLimit) *
+                      100,
+                  ) / 100;
+
+                planningByCategory.percentOutcome =
+                  Math.round(
+                    ((planningByCategory.typeOutcome * 100) /
                       planningByCategory.categoryLimit) *
                       100,
                   ) / 100;

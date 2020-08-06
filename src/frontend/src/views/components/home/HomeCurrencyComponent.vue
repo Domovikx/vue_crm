@@ -15,8 +15,8 @@ export default Vue.extend({
 </script>
 
 <template>
-  <div class="col s12 m6 l8">
-    <v-card>
+  <v-col cols="12" sm="12" md="6">
+    <v-card color="backgroundMain" outlined>
       <v-card-title>Курс валют</v-card-title>
 
       <v-simple-table>
@@ -31,7 +31,16 @@ export default Vue.extend({
         <tbody>
           <tr v-for="symbol in currenciesKeysGetter" :key="symbol">
             <td>{{ symbol }}</td>
-            <td>{{ currency[symbol].rate | currencyFilter('BYN', 3) }}</td>
+            <td>
+              {{
+                currency[symbol].rate
+                  | currencyFilter({
+                    style: 'currency',
+                    currency: symbol,
+                    maximumFractionDigits: 3,
+                  })
+              }}
+            </td>
             <td>
               {{ currency[symbol].date | dateFilter('DD-MM-YYYY') }}
             </td>
@@ -39,5 +48,5 @@ export default Vue.extend({
         </tbody>
       </v-simple-table>
     </v-card>
-  </div>
+  </v-col>
 </template>

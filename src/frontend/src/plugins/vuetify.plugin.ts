@@ -15,6 +15,7 @@ export default new Vuetify({
         success: '#4CAF50',
         warning: '#FFC107',
         disabled: '#263238',
+        backgroundMain: '#f5f5f5',
       },
     },
   },

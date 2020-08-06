@@ -46,9 +46,8 @@ export default Vue.extend({
   created() {},
 
   async mounted() {
-    if (await !this.$store.getters.uidGetter) {
-      await this.$store.dispatch('fetchInfoAction');
-    }
+    this.checkAvailabilityData();
+
     this.loading = false;
 
     this.name = this.infoUserNameGetter;
@@ -67,6 +66,12 @@ export default Vue.extend({
       const bill: number | any = Number(this.bill);
       this.infoUpdateAction({ name, bill });
     },
+
+    async checkAvailabilityData() {
+      if (await !this.$store.getters.uidGetter) {
+        await this.$store.dispatch('fetchInfoAction');
+      }
+    },
   },
 });
 </script>
@@ -75,10 +80,17 @@ export default Vue.extend({
   <LoaderComponent v-if="loading" />
 
   <div v-else-if="!loading">
-    <v-card-title v-if="bill">
-      Планирование
+    <v-card-title>
+      Профиль
       <v-spacer></v-spacer>
-      {{ bill | currencyFilter() }}
+      {{
+        bill
+          | currencyFilter({
+            style: 'currency',
+            currency: 'byn',
+            maximumFractionDigits: 2,
+          })
+      }}
     </v-card-title>
 
     <v-form ref="form" v-model="valid">

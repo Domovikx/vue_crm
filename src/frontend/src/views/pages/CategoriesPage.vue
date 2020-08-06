@@ -3,9 +3,10 @@ import Vue from 'vue';
 
 import { mapGetters } from 'vuex';
 
+import LoaderComponent from '../../components/LoaderComponent.vue';
 import CategoriesCreateComponent from '../components/categories/CategoriesCreateComponent.vue';
 import CategoriesEditComponent from '../components/categories/CategoriesEditComponent.vue';
-import LoaderComponent from '../../components/LoaderComponent.vue';
+import CategoriesListComponent from '../components/categories/CategoriesListComponent.vue';
 
 export default Vue.extend({
   name: 'CategoriesPage',
@@ -15,21 +16,20 @@ export default Vue.extend({
 
   components: {
     LoaderComponent,
+
     CategoriesCreateComponent,
     CategoriesEditComponent,
+    CategoriesListComponent,
   },
 
   data: () => ({
     loading: true,
 
-    showEditComponent: false,
+    categoriesExist: false,
   }),
 
   async mounted() {
-    if (await !this.$store.getters.uidGetter) {
-      await this.$store.dispatch('fetchInfoAction');
-    }
-    await this.$store.dispatch('fetchCategoriesAction');
+    await this.checkAvailabilityData();
     this.loading = false;
   },
 
@@ -44,7 +44,16 @@ export default Vue.extend({
   watch: {
     categories() {
       const categories: any[] = this.categories;
-      this.showEditComponent = categories.length > 0 ? true : false;
+      this.categoriesExist = categories.length > 0 ? true : false;
+    },
+  },
+
+  methods: {
+    async checkAvailabilityData() {
+      if (await !this.$store.getters.uidGetter) {
+        await this.$store.dispatch('fetchInfoAction');
+      }
+      await this.$store.dispatch('fetchCategoriesAction');
     },
   },
 });
@@ -53,14 +62,11 @@ export default Vue.extend({
 <template>
   <LoaderComponent v-if="loading" />
 
-  <div v-else-if="!loading">
-    <v-card-title>
-      Категории
-    </v-card-title>
-
-    <div class="row">
+  <v-card v-else-if="!loading" color="backgroundMain" outlined>
+    <v-row justify="center">
       <CategoriesCreateComponent />
-      <CategoriesEditComponent v-if="showEditComponent" />
-    </div>
-  </div>
+      <CategoriesEditComponent v-if="categoriesExist" />
+      <CategoriesListComponent v-if="categoriesExist" />
+    </v-row>
+  </v-card>
 </template>
