@@ -47,6 +47,7 @@ git config user.email
 
 - памятки команд:
 
+git branch name_branch (**создать** ветку)  
 git checkout -b name_branch (**создать и перейти** на ветку)  
 git checkout name_branch (**перейти** на ветку)  
 git merge --squash name_branch (**сквош** ветки)  

@@ -15,7 +15,7 @@ export default Vue.extend({
     valid: true,
     lazy: false,
 
-    email: '',
+    email: 'demo@mail.com',
     emailRules: [
       (v: string) => !!v || 'E-mail нужно заполнить',
       (v: string) =>
@@ -23,7 +23,7 @@ export default Vue.extend({
         'E-mail должен быть правильным',
     ],
 
-    password: '',
+    password: '123456',
     passwordShow: false,
     passwordRules: [
       (v: string) => !!v || 'Password нужно заполнить',
