@@ -372,13 +372,13 @@ interface CategoryItem {
   justify-content: flex-end;
 }
 
+.truncate {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  min-width: 200px;
+}
+
 @media (max-width: 600px) {
-  .truncate {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    min-width: 200px;
-  }
   .v-card-actions {
     display: flex;
     justify-content: space-evenly;
